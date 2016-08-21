@@ -1,0 +1,58 @@
+{
+  "author": "planttheidea",
+  "bugs": {
+    "url": "https://github.com/planttheidea/react-style-tag/issues"
+  },
+  "dependencies": {
+    "autoprefixer": "^6.4.0",
+    "postcss": "^5.1.2",
+    "react": ">=15.0.0"
+  },
+  "description": "Write scoped, autoprefixed styles declaratively in React",
+  "devDependencies": {
+    "babel": "6.5.2",
+    "babel-cli": "6.11.4",
+    "babel-eslint": "6.1.2",
+    "babel-loader": "6.2.5",
+    "babel-plugin-add-module-exports": "0.2.1",
+    "babel-polyfill": "^6.13.0",
+    "babel-preset-es2015": "6.13.2",
+    "babel-preset-es2015-loose": "^7.0.0",
+    "babel-preset-react": "6.11.1",
+    "babel-preset-stage-0": "6.5.0",
+    "babel-register": "^6.11.6",
+    "eslint": "3.3.1",
+    "eslint-friendly-formatter": "2.0.6",
+    "eslint-loader": "1.5.0",
+    "html-webpack-plugin": "^2.22.0",
+    "in-publish": "^2.0.0",
+    "json-loader": "^0.5.4",
+    "react-dom": "^15.3.1",
+    "webpack": "1.13.2",
+    "webpack-dev-server": "1.14.1"
+  },
+  "homepage": "https://github.com/planttheidea/react-style-tag#readme",
+  "keywords": [
+    "convert",
+    "to",
+    "number",
+    "string",
+    "array",
+    "object"
+  ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "name": "react-style-tag",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/planttheidea/react-style-tag.git"
+  },
+  "scripts": {
+    "compile-for-publish": "npm run lint && npm run transpile",
+    "dev": "NODE_ENV=development ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --colors --config=webpack.config.dev.js",
+    "lint": "NODE_ENV=test ./node_modules/eslint/bin/eslint.js src",
+    "prepublish": "in-publish && npm run compile-for-publish || in-install",
+    "transpile": "./node_modules/babel-cli/lib/babel/index.js -d lib/ src/"
+  },
+  "version": "1.0.0"
+}
