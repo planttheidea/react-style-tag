@@ -46,7 +46,7 @@ class App extends Component {
         </h1>
         
         <Style>{`
-          .test {
+          .foo {
             color: red;
           }
         `}</Style>
