@@ -1,3 +1,5 @@
+let counter = 0;
+
 /**
  * simple bitwise hash of string value
  *
@@ -5,10 +7,10 @@
  * @return {number} 32-bit positive integer hash
  */
 const hash = (key) => {
-  const stringToHash = `${key}`;
+  const stringToHash = `${key}-${counter}`;
 
   let hashValue = 5381,
-    index = stringToHash.length;
+      index = stringToHash.length;
 
   while (index) {
     hashValue = (hashValue * 33) ^ stringToHash.charCodeAt(--index);
@@ -34,6 +36,8 @@ const hashKeys = (keys = []) => {
     key = keys[index];
     hashMap[key] = hash(key);
   }
+
+  counter++;
 
   return hashMap;
 };

@@ -48,7 +48,7 @@ const ToggledDiv = ({color}) => {
 
         @media screen and (min-width: 1000px) {
           html {
-            background-color: red;
+            background-color: lightgray;
           }
         }
       `}</Style>
@@ -110,7 +110,7 @@ setInterval(() => {
   render((
     <App color={getRandomColor()}/>
   ), div);
-}, 10000);
+}, 1000);
 
 render((
   <App color={getRandomColor()}/>
