@@ -53,5 +53,5 @@
     "prepublish": "in-publish && npm run compile-for-publish || in-install",
     "transpile": "./node_modules/babel-cli/lib/babel/index.js -d lib/ src/"
   },
-  "version": "1.0.1"
+  "version": "1.0.2"
 }

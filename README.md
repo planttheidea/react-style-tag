@@ -80,31 +80,33 @@ const {
 class App extends Component {
   render() {
     return (
-      <div className={foo}>
-        My text is red due to the scoped style of foo.
-      </div>
-      
-      <div className={bar}>
-        My text is green due to the scoped style of bar.
-      </div>
-      
-      <div className="baz">
-        My text is blue due to the global style of baz.
-      </div>
-      
-      <Style>{`
-        .${foo} {
-          color: red;
-        }
-        
-        .${bar} {
-          color: green;
-        }
-        
-        .baz {
-          color: blue;
-        }
-      `}</Style>
+        <div>
+          <div className={foo}>
+            My text is red due to the scoped style of foo.
+          </div>
+          
+          <div className={bar}>
+            My text is green due to the scoped style of bar.
+          </div>
+          
+          <div className="baz">
+            My text is blue due to the global style of baz.
+          </div>
+          
+          <Style>{`
+            .${foo} {
+              color: red;
+            }
+            
+            .${bar} {
+              color: green;
+            }
+            
+            .baz {
+              color: blue;
+            }
+          `}</Style>
+        </div>
     );
   }
 }
