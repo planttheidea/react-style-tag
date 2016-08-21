@@ -33,12 +33,11 @@
   },
   "homepage": "https://github.com/planttheidea/react-style-tag#readme",
   "keywords": [
-    "convert",
-    "to",
-    "number",
-    "string",
-    "array",
-    "object"
+    "react",
+    "style",
+    "css",
+    "css-modules",
+    "postcss"
   ],
   "license": "MIT",
   "main": "lib/index.js",
@@ -54,5 +53,5 @@
     "prepublish": "in-publish && npm run compile-for-publish || in-install",
     "transpile": "./node_modules/babel-cli/lib/babel/index.js -d lib/ src/"
   },
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
