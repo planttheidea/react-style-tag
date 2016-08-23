@@ -8,16 +8,6 @@ const prefixer = postcss([
 ]);
 
 /**
- * return the css after running through autoprefixer
- *
- * @param {string} cssText
- * @returns {string}
- */
-const prefixCss = (cssText) => {
-  return prefixer.process(cssText).css;
-};
-
-/**
  * return the minified string css
  *
  * @param {string} cssText
@@ -36,6 +26,16 @@ const minify = (cssText) => {
     .replace(/\b(\d+[a-z]{2}) \1 \1 \1/gi, '$1')
     .replace(/\b(\d+[a-z]{2}) (\d+[a-z]{2}) \1 \2/gi, '$1 $2')
     .replace(/([\s|:])[0]+px/g, '$10');
+};
+
+/**
+ * return the css after running through autoprefixer
+ *
+ * @param {string} cssText
+ * @returns {string}
+ */
+const prefixCss = (cssText) => {
+  return prefixer.process(cssText).css;
 };
 
 export {minify};
