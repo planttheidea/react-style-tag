@@ -34,23 +34,11 @@ class Style extends Component {
   };
 
   componentDidMount() {
-    const {
-      doNotPrefix
-    } = this.props;
-
-    if (!doNotPrefix) {
-      this.setPrefixedCss();
-    }
+    this.setStyleTag();
   }
 
   componentDidUpdate() {
-    const {
-      doNotPrefix
-    } = this.props;
-
-    if (!doNotPrefix) {
-      this.setPrefixedCss();
-    }
+    this.setStyleTag();
   }
 
   componentWillUnmount() {
@@ -68,9 +56,10 @@ class Style extends Component {
   /**
    * re-prefix the updated values and update the contents
    */
-  setPrefixedCss = () => {
+  setStyleTag = () => {
     const {
       children,
+      doNotPrefix,
       isMinified
     } = this.props;
 
@@ -79,9 +68,9 @@ class Style extends Component {
     }
 
     const style = this.refs.styleTag;
-    const prefixedCss = prefixCss(children);
+    const transformedCss = doNotPrefix ? children : prefixCss(children);
 
-    style.textContent = isMinified ? minify(prefixedCss) : prefixedCss;
+    style.textContent = isMinified ? minify(transformedCss) : transformedCss;
 
     document.head.appendChild(style);
   };
