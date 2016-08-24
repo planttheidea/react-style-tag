@@ -21,6 +21,11 @@ const HAS_BLOB_SUPPORT = !!(window.Blob && typeof window.Blob === 'function' && 
     return false;
   }
 })(window);
+const NO_BLOB_SUPPORT_ERROR = (`
+To support sourcemaps for react-style-tag you need Blob support, and the browser you are using does not currently 
+support it. Please import the included polyfill at 'react-style-tag/blob-polyfill.js'.
+`).replace(/\r?\n|\r/, '');
+const ONLY_TEXT_ERROR = 'The only type of child that can be used in the <Style/> tag is text.';
 
 /**
  * get the (if applicable) prefixed and minified css based on the
@@ -47,11 +52,16 @@ const isString = (object) => {
   return Object.prototype.toString.call(object) === '[object String]';
 };
 
-const NEWLINE_REGEX = /\r?\n|\r/;
-const NO_BLOB_SUPPORT_ERROR = (`
-To support sourcemaps for react-style-tag you need Blob support, and the browser you are using does not currently 
-support it. Please import the included polyfill at 'react-style-tag/blob-polyfill.js'.
-`).replace(NEWLINE_REGEX, '');
+/**
+ * throw an error if the provided children is not a text node
+ *
+ * @param {*} children
+ */
+const throwErrorIfIsNotText = (children) => {
+  if (!isString(children)) {
+    throw new Error(ONLY_TEXT_ERROR);
+  }
+};
 
 class Style extends Component {
   static propTypes = {
@@ -76,7 +86,8 @@ class Style extends Component {
   }
 
   componentWillUnmount() {
-    document.head.removeChild(this.refs.styleTag);
+    this.removeTagFromHead('link');
+    this.removeTagFromHead('style');
   }
 
   shouldComponentUpdate({children: nextChildren}) {
@@ -86,6 +97,19 @@ class Style extends Component {
 
     return children !== nextChildren;
   }
+
+  /**
+   * remove the tagType from the document head if it exists
+   *
+   * @param {string} tagType
+   */
+  removeTagFromHead = (tagType) => {
+    const tag = this.refs[tagType];
+
+    if (tag) {
+      document.head.removeChild(tag);
+    }
+  };
 
   /**
    * based on whether sourcemaps are requested, set either a link or style tag
@@ -112,12 +136,12 @@ class Style extends Component {
       isMinified
     } = this.props;
 
-    if (!isString(children)) {
-      throw new Error('The only type of child that can be used in the <Style/> tag is text.');
-    }
+    throwErrorIfIsNotText(children);
+
+    this.removeTagFromHead('style');
 
     if (HAS_BLOB_SUPPORT) {
-      const link = this.refs.linkTag;
+      const link = this.refs.link;
       const transformedCss = getTransformedCss(children, doNotPrefix, isMinified);
       const blob = new window.Blob([transformedCss], {
         type: 'text/css'
@@ -141,11 +165,11 @@ class Style extends Component {
       isMinified
     } = this.props;
 
-    if (!isString(children)) {
-      throw new Error('The only type of child that can be used in the <Style/> tag is text.');
-    }
+    throwErrorIfIsNotText(children);
 
-    const style = this.refs.styleTag;
+    this.removeTagFromHead('link');
+
+    const style = this.refs.style;
 
     style.textContent = getTransformedCss(children, doNotPrefix, isMinified);
 
@@ -165,7 +189,7 @@ class Style extends Component {
       return (
         <link
           rel="stylesheet"
-          ref="linkTag"
+          ref="link"
           {...otherProps}
         />
       );
@@ -173,7 +197,7 @@ class Style extends Component {
 
     return (
       <style
-        ref="styleTag"
+        ref="style"
         {...otherProps}
       >
         {children}
