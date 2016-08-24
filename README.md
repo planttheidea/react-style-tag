@@ -154,6 +154,37 @@ This would result in:
 <style>.test{display:block}</style>
 ```
 
+### Global Options
+
+All of the props available are also available as global options for all instances that can be set with the `setGlobalOptions` method:
+
+```javascript
+import Style from 'react-style-tag';
+
+Style.setGlobalOptions({
+    doNotPrefix: true,
+    hasSourceMap: true,
+    isMinified: true
+});
+```
+
+All default values are the same as those available for props. A common use case would be something like:
+
+```javascript
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+Style.setGlobalOptions({
+    hasSourceMap: !IS_PRODUCTION,
+    isMinified: IS_PRODUCTION
+});
+
+<Style>
+  .test {
+    display: block;
+  }
+</Style>
+```
+
 ### Development
 
 Standard stuff, clone the repo and `npm i` to get the dependencies. npm scripts available:

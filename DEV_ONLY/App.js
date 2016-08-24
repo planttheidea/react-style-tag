@@ -24,6 +24,11 @@ const {
   test
 } = hashKeys(keys);
 
+/**
+ * get a random color for the text
+ *
+ * @returns {string}
+ */
 const getRandomColor = () => {
   const randomR = Math.floor(Math.random() * 255);
   const randomG = Math.floor(Math.random() * 255);
@@ -32,6 +37,10 @@ const getRandomColor = () => {
   return `rgb(${randomR}, ${randomG}, ${randomB})`;
 };
 
+Style.setGlobalOptions({
+  hasSourceMap: true
+});
+
 const ToggledDiv = ({color}) => {
   return (
     <div>
@@ -39,10 +48,7 @@ const ToggledDiv = ({color}) => {
         I am display inline-block
       </div>
 
-      <Style
-        hasSourceMap
-        id="custom-style-block"
-      >{`
+      <Style id="custom-style-block">{`
         .${test} {
           color: ${color};
           display: inline-flex;

@@ -43,6 +43,31 @@ const getTransformedCss = (cssText, doNotPrefix, isMinified) => {
 };
 
 /**
+ * return the propsValue if it exists, else return the defaultValue
+ * 
+ * @param {boolean} propsValue
+ * @param {boolean} defaultValue
+ * @returns {boolean}
+ */
+const getCoalescedPropsValue = (propsValue, defaultValue) => {
+  if (isUndefined(propsValue)) {
+    return defaultValue;
+  }
+  
+  return propsValue;
+};
+
+/**
+ * determine if object is a boolean
+ *
+ * @param {*} object
+ * @returns {boolean}
+ */
+const isBoolean = (object) => {
+  return object === true || object === false;
+};
+
+/**
  * determine if object is a string
  *
  * @param {*} object
@@ -50,6 +75,16 @@ const getTransformedCss = (cssText, doNotPrefix, isMinified) => {
  */
 const isString = (object) => {
   return Object.prototype.toString.call(object) === '[object String]';
+};
+
+/**
+ * determine if object is undefined
+ *
+ * @param {*} object
+ * @returns {boolean}
+ */
+const isUndefined = (object) => {
+  return object === void 0;
 };
 
 /**
@@ -63,18 +98,18 @@ const throwErrorIfIsNotText = (children) => {
   }
 };
 
+const REACT_STYLE_TAG_GLOBAL_PROPERTIES = {
+  doNotPrefix: false,
+  hasSourceMap: false,
+  isMinified: false
+};
+
 class Style extends Component {
   static propTypes = {
     children: PropTypes.node,
     doNotPrefix: PropTypes.bool,
     hasSourceMap: PropTypes.bool,
     isMinified: PropTypes.bool
-  };
-
-  static defaultProps = {
-    doNotPrefix: false,
-    hasSourceMap: false,
-    isMinified: false
   };
 
   componentDidMount() {
@@ -99,6 +134,26 @@ class Style extends Component {
   }
 
   /**
+   * set the global options for all instances of Style
+   *
+   * @param {object} options
+   * @param {boolean} [options.doNotPrefix]
+   * @param {boolean} [options.hasSourceMap]
+   * @param {boolean} [options.isMinified]
+   */
+  static setGlobalOptions(options) {
+    Object.keys(options).forEach((option) => {
+      if (REACT_STYLE_TAG_GLOBAL_PROPERTIES.hasOwnProperty(option)) {
+        if (!isBoolean(options[option])) {
+          throw new Error(`${option} must be a boolean value.`);
+        }
+
+        REACT_STYLE_TAG_GLOBAL_PROPERTIES[option] = options[option];
+      }
+    });
+  }
+
+  /**
    * remove the tagType from the document head if it exists
    *
    * @param {string} tagType
@@ -118,8 +173,14 @@ class Style extends Component {
     const {
       hasSourceMap
     } = this.props;
+    
+    const {
+      hasSourceMap: hasSourceMapGlobal
+    } = REACT_STYLE_TAG_GLOBAL_PROPERTIES;
+    
+    const hasSourceMapFinal = getCoalescedPropsValue(hasSourceMap, hasSourceMapGlobal);
 
-    if (hasSourceMap) {
+    if (hasSourceMapFinal) {
       this.setLinkTag();
     } else {
       this.setStyleTag();
@@ -141,8 +202,15 @@ class Style extends Component {
     this.removeTagFromHead('style');
 
     if (HAS_BLOB_SUPPORT) {
+      const {
+        doNotPrefix: doNotPrefixGlobal,
+        isMinified: isMinifiedGlobal
+      } = REACT_STYLE_TAG_GLOBAL_PROPERTIES;
+
+      const doNotPrefixFinal = getCoalescedPropsValue(doNotPrefix, doNotPrefixGlobal);
+      const isMinifiedFinal = getCoalescedPropsValue(isMinified, isMinifiedGlobal);
       const link = this.refs.link;
-      const transformedCss = getTransformedCss(children, doNotPrefix, isMinified);
+      const transformedCss = getTransformedCss(children, doNotPrefixFinal, isMinifiedFinal);
       const blob = new window.Blob([transformedCss], {
         type: 'text/css'
       });
@@ -165,13 +233,20 @@ class Style extends Component {
       isMinified
     } = this.props;
 
+    const {
+      doNotPrefix: doNotPrefixGlobal,
+      isMinified: isMinifiedGlobal
+    } = REACT_STYLE_TAG_GLOBAL_PROPERTIES;
+
     throwErrorIfIsNotText(children);
 
     this.removeTagFromHead('link');
 
+    const doNotPrefixFinal = getCoalescedPropsValue(doNotPrefix, doNotPrefixGlobal);
+    const isMinifiedFinal = getCoalescedPropsValue(isMinified, isMinifiedGlobal);
     const style = this.refs.style;
 
-    style.textContent = getTransformedCss(children, doNotPrefix, isMinified);
+    style.textContent = getTransformedCss(children, doNotPrefixFinal, isMinifiedFinal);
 
     document.head.appendChild(style);
   };
@@ -185,7 +260,13 @@ class Style extends Component {
       ...otherProps
     } = this.props;
 
-    if (hasSourceMap && HAS_BLOB_SUPPORT) {
+    const {
+      hasSourceMap: hasSourceMapGlobal
+    } = REACT_STYLE_TAG_GLOBAL_PROPERTIES;
+
+    const hasSourceMapFinal = getCoalescedPropsValue(hasSourceMap, hasSourceMapGlobal);
+
+    if (hasSourceMapFinal && HAS_BLOB_SUPPORT) {
       return (
         <link
           rel="stylesheet"
