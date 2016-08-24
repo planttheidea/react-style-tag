@@ -7,8 +7,9 @@ Write styles declaratively in React
 * [Usage](#usage)
 * [Implementation](#implementation)
 * [Summary](#summary)
-* [Scoped styles](#scoped-styles)
+* [Scoped Styles](#scoped-styles)
 * [Props](#props)
+* [Global Options](#global-options)
 * [Development](#development)
 * [Todo](#todo)
 
@@ -62,7 +63,7 @@ class App extends Component {
 
 The style tag that is injected into the head will be automatically mounted whenever the component it is rendered in is mounted, and will be automatically unmounted whenever the component it is rendered in is unmounted.
 
-#### Scoped styles
+#### Scoped Styles
 
 There is an additional utility provided that can help to scope your styles in the vein of [CSS Modules](https://github.com/css-modules/css-modules), and this is `hashKeys`. This function accepts an array of keys to hash, and returns a map of the keys to their hashed values.
 
