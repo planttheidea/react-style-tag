@@ -122,6 +122,10 @@ Naturally you can pass all standard attributes (`id`, `name`, etc.) and they wil
 
 If set to `true`, it will prevent autoprefixer from processing the CSS and just render whatever text you pass it.
 
+**hasSourceMap** *boolean, defaults to false*
+
+If se to `true`, it will render a `<link>` tag via `Blob` instead of a `<style>` tag, which allows easy source referencing in browser DevTools. This is similar to the way that webpack handles its `style-loader`.
+
 **isMinified** *boolean, defaults to false*
 
 If set to `true`, it will minify the rendered CSS text. A possible implementation for this would be something like:

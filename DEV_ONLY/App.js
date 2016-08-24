@@ -39,7 +39,10 @@ const ToggledDiv = ({color}) => {
         I am display inline-block
       </div>
 
-      <Style id="custom-style-block">{`
+      <Style
+        hasSourceMap
+        id="custom-style-block"
+      >{`
         .${test} {
           color: ${color};
           display: inline-flex;
