@@ -7,8 +7,9 @@ Write styles declaratively in React
 * [Usage](#usage)
 * [Implementation](#implementation)
 * [Summary](#summary)
-* [Scoped styles](#scoped-styles)
+* [Scoped Styles](#scoped-styles)
 * [Props](#props)
+* [Global Options](#global-options)
 * [Development](#development)
 * [Todo](#todo)
 
@@ -62,7 +63,7 @@ class App extends Component {
 
 The style tag that is injected into the head will be automatically mounted whenever the component it is rendered in is mounted, and will be automatically unmounted whenever the component it is rendered in is unmounted.
 
-#### Scoped styles
+#### Scoped Styles
 
 There is an additional utility provided that can help to scope your styles in the vein of [CSS Modules](https://github.com/css-modules/css-modules), and this is `hashKeys`. This function accepts an array of keys to hash, and returns a map of the keys to their hashed values.
 
@@ -152,6 +153,37 @@ This would result in:
 
 ```javascript
 <style>.test{display:block}</style>
+```
+
+### Global Options
+
+All of the props available are also available as global options for all instances that can be set with the `setGlobalOptions` method:
+
+```javascript
+import Style from 'react-style-tag';
+
+Style.setGlobalOptions({
+    doNotPrefix: true,
+    hasSourceMap: true,
+    isMinified: true
+});
+```
+
+All default values are the same as those available for props. A common use case would be something like:
+
+```javascript
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+Style.setGlobalOptions({
+    hasSourceMap: !IS_PRODUCTION,
+    isMinified: IS_PRODUCTION
+});
+
+<Style>
+  .test {
+    display: block;
+  }
+</Style>
 ```
 
 ### Development
