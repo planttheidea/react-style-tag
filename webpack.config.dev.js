@@ -69,8 +69,8 @@ module.exports = {
     },
 
     output: {
-        filename: 'convertify.js',
-        library: 'convertify',
+        filename: 'react-style-tag.js',
+        library: 'ReactStyleTag',
         path: path.resolve(__dirname, 'dist'),
         publicPath: `http://localhost:${PORT}/`,
         umdNamedDefine: true

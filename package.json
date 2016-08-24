@@ -5,6 +5,7 @@
   },
   "dependencies": {
     "autoprefixer": "^6.4.0",
+    "blob-polyfill": "^1.0.20150320",
     "postcss": "^5.1.2",
     "react": ">=15.0.0"
   },
@@ -48,10 +49,10 @@
   },
   "scripts": {
     "compile-for-publish": "npm run lint && npm run transpile",
-    "dev": "NODE_ENV=development ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --colors --config=webpack.config.dev.js",
-    "lint": "NODE_ENV=test ./node_modules/eslint/bin/eslint.js src",
+    "dev": "NODE_ENV=development node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --colors --config=webpack.config.dev.js",
+    "lint": "NODE_ENV=test node ./node_modules/eslint/bin/eslint.js src",
     "prepublish": "in-publish && npm run compile-for-publish || in-install",
-    "transpile": "./node_modules/babel-cli/lib/babel/index.js -d lib/ src/"
+    "transpile": "node ./node_modules/babel-cli/lib/babel/index.js -d lib/ src/"
   },
-  "version": "1.0.4"
+  "version": "1.1.0"
 }
