@@ -124,7 +124,15 @@ If set to `true`, it will prevent autoprefixer from processing the CSS and just 
 
 **hasSourceMap** *boolean, defaults to false*
 
-If se to `true`, it will render a `<link>` tag via `Blob` instead of a `<style>` tag, which allows easy source referencing in browser DevTools. This is similar to the way that webpack handles its `style-loader`.
+If se to `true`, it will render a `<link>` tag instead of a `<style>` tag, which allows easy source referencing in browser DevTools. This is similar to the way that webpack handles its `style-loader`.
+
+The use of sourcemaps require the use of `Blob`, which is supported in IE10+, Safari 6.1+, and all other modern browsers (Chrome, Firefox, etc.). If you browser does not support `Blob` and you want to use sourcemaps, there is an included polyfill which you will need to import separately:
+
+```javascript
+import 'react-script-tag/blob-polyfill';
+```
+
+Make sure this import occurs prior to the import of `react-style-tag`.
 
 **isMinified** *boolean, defaults to false*
 
