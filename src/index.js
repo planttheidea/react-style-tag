@@ -5,62 +5,22 @@ import React, {
 } from 'react';
 
 // local utils
+import {
+  hasBlobSupport,
+  noBlobSupportError,
+  onlyTextError
+} from './constants';
 import hashKeys from './hash';
 import {
   isBoolean,
-  isString,
-  isUndefined
+  isString
 } from './is';
 import {
-  minify,
+  getCoalescedPropsValue,
+  getTransformedCss,
+  minify as minifyCss,
   prefixCss
 } from './transform';
-
-const URL = window.URL || window.webkitURL;
-const HAS_BLOB_SUPPORT = !!(window.Blob && typeof window.Blob === 'function' && URL.createObjectURL) && ((win) => {
-  try {
-    new win.Blob;
-
-    return true;
-  } catch (exception) {
-    return false;
-  }
-})(window);
-const NO_BLOB_SUPPORT_ERROR = (`
-To support sourcemaps for react-style-tag you need Blob support, and the browser you are using does not currently 
-support it. Please import the included polyfill at 'react-style-tag/blob-polyfill.js'.
-`).replace(/\r?\n|\r/, '');
-const ONLY_TEXT_ERROR = 'The only type of child that can be used in the <Style/> tag is text.';
-
-/**
- * get the (if applicable) prefixed and minified css based on the
- * original cssText
- *
- * @param {string} cssText
- * @param {boolean} doNotPrefix
- * @param {boolean} isMinified
- * @returns {string}
- */
-const getTransformedCss = (cssText, doNotPrefix, isMinified) => {
-  const transformedCss = doNotPrefix ? cssText : prefixCss(cssText);
-
-  return isMinified ? minify(transformedCss) : transformedCss;
-};
-
-/**
- * return the propsValue if it exists, else return the defaultValue
- * 
- * @param {boolean} propsValue
- * @param {boolean} defaultValue
- * @returns {boolean}
- */
-const getCoalescedPropsValue = (propsValue, defaultValue) => {
-  if (isUndefined(propsValue)) {
-    return defaultValue;
-  }
-  
-  return propsValue;
-};
 
 /**
  * throw an error if the provided children is not a text node
@@ -69,7 +29,7 @@ const getCoalescedPropsValue = (propsValue, defaultValue) => {
  */
 const throwErrorIfIsNotText = (children) => {
   if (!isString(children)) {
-    throw new Error(ONLY_TEXT_ERROR);
+    throw new Error(onlyTextError);
   }
 };
 
@@ -176,7 +136,7 @@ class Style extends Component {
 
     this.removeTagFromHead('style');
 
-    if (HAS_BLOB_SUPPORT) {
+    if (hasBlobSupport) {
       const {
         doNotPrefix: doNotPrefixGlobal,
         isMinified: isMinifiedGlobal
@@ -184,8 +144,9 @@ class Style extends Component {
 
       const doNotPrefixFinal = getCoalescedPropsValue(doNotPrefix, doNotPrefixGlobal);
       const isMinifiedFinal = getCoalescedPropsValue(isMinified, isMinifiedGlobal);
-      const link = this.refs.link;
       const transformedCss = getTransformedCss(children, doNotPrefixFinal, isMinifiedFinal);
+
+      const link = this.refs.link;
       const blob = new window.Blob([transformedCss], {
         type: 'text/css'
       });
@@ -194,7 +155,7 @@ class Style extends Component {
 
       document.head.appendChild(link);
     } else {
-      throw new Error(NO_BLOB_SUPPORT_ERROR);
+      throw new Error(noBlobSupportError);
     }
   };
 
@@ -219,6 +180,7 @@ class Style extends Component {
 
     const doNotPrefixFinal = getCoalescedPropsValue(doNotPrefix, doNotPrefixGlobal);
     const isMinifiedFinal = getCoalescedPropsValue(isMinified, isMinifiedGlobal);
+
     const style = this.refs.style;
 
     style.textContent = getTransformedCss(children, doNotPrefixFinal, isMinifiedFinal);
@@ -241,7 +203,7 @@ class Style extends Component {
 
     const hasSourceMapFinal = getCoalescedPropsValue(hasSourceMap, hasSourceMapGlobal);
 
-    if (hasSourceMapFinal && HAS_BLOB_SUPPORT) {
+    if (hasSourceMapFinal && hasBlobSupport) {
       return (
         <link
           rel="stylesheet"
@@ -263,5 +225,7 @@ class Style extends Component {
 }
 
 export {hashKeys};
+export {minifyCss};
+export {prefixCss};
 
 export default Style;

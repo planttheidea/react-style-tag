@@ -1,11 +1,32 @@
+// external dependencies
 import autoprefixer from 'autoprefixer';
 import postcss from 'postcss';
+
+// checkers
+import {
+  isUndefined
+} from './is';
 
 const prefixer = postcss([
   autoprefixer({
     remove: false
   })
 ]);
+
+/**
+ * return the propsValue if it exists, else return the defaultValue
+ *
+ * @param {boolean} propsValue
+ * @param {boolean} defaultValue
+ * @returns {boolean}
+ */
+const getCoalescedPropsValue = (propsValue, defaultValue) => {
+  if (isUndefined(propsValue)) {
+    return defaultValue;
+  }
+
+  return propsValue;
+};
 
 /**
  * return the minified string css
@@ -38,5 +59,22 @@ const prefixCss = (cssText) => {
   return prefixer.process(cssText).css;
 };
 
+/**
+ * get the (if applicable) prefixed and minified css based on the
+ * original cssText
+ *
+ * @param {string} cssText
+ * @param {boolean} doNotPrefix=false
+ * @param {boolean} isMinified=false
+ * @returns {string}
+ */
+const getTransformedCss = (cssText, doNotPrefix = false, isMinified = false) => {
+  const transformedCss = doNotPrefix ? cssText : prefixCss(cssText);
+
+  return isMinified ? minify(transformedCss) : transformedCss;
+};
+
+export {getCoalescedPropsValue};
+export {getTransformedCss};
 export {minify};
 export {prefixCss};
