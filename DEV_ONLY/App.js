@@ -9,8 +9,11 @@ import {
 } from 'react-dom';
 
 import Style, {
-  hashKeys
+  hashKeys,
+  minifyCss
 } from '../src';
+
+console.log(minifyCss);
 
 const keys = [
   'test',
