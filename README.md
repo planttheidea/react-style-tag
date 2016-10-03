@@ -10,6 +10,7 @@ Write styles declaratively in React
 * [Scoped Styles](#scoped-styles)
 * [Props](#props)
 * [Global Options](#global-options)
+* [Additional webpack configuration requirements](#additional-webpack-configuration-requirements)
 * [Development](#development)
 * [Todo](#todo)
 
@@ -185,6 +186,18 @@ Style.setGlobalOptions({
   }
 </Style>
 ```
+
+### Additional webpack configuration requirements
+
+`react-style-tag` makes use of PostCSS, which has server-side methods that are not used. As such, it expects the `fs` module to be present, which means you will need to stub it. In your webpack config, add the following object top-level:
+
+```javascript
+node: {
+  fs: 'empty'
+}
+```
+
+Additionally, PostCSS makes heavy use of JSON internally, so you will likely need to add `json-loader` to your list of loaders.
 
 ### Development
 
