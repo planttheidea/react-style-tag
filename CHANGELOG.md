@@ -1,5 +1,8 @@
 # react-style-tag CHANGELOG
 
+#### 1.3.0
+* Add caching to prevent duplicate tags from being added to head
+
 #### 1.2.0
 * Add `setGlobalOptions` method to apply props globally for all instanes
 
