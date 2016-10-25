@@ -1,4 +1,6 @@
 // external dependencies
+import isBoolean from 'lodash/isBoolean';
+import isNull from 'lodash/isNull';
 import React, {
   Component,
   PropTypes
@@ -6,32 +8,22 @@ import React, {
 
 // local utils
 import {
-  hasBlobSupport,
-  noBlobSupportError,
-  onlyTextError
+  HAS_BLOB_SUPPORT,
+  NO_BLOB_SUPPORT_ERROR
 } from './constants';
 import hashKeys from './hash';
-import {
-  isBoolean,
-  isString
-} from './is';
 import {
   getCoalescedPropsValue,
   getTransformedCss,
   minify as minifyCss,
   prefixCss
 } from './transform';
-
-/**
- * throw an error if the provided children is not a text node
- *
- * @param {*} children
- */
-const throwErrorIfIsNotText = (children) => {
-  if (!isString(children)) {
-    throw new Error(onlyTextError);
-  }
-};
+import {
+  createIdForTag,
+  removeIdFromCache,
+  setCacheId,
+  throwErrorIfIsNotText
+} from './utils';
 
 const REACT_STYLE_TAG_GLOBAL_PROPERTIES = {
   doNotPrefix: false,
@@ -47,18 +39,39 @@ class Style extends Component {
     isMinified: PropTypes.bool
   };
 
+  componentWillMount() {
+    const {
+      children,
+      id
+    } = this.props;
+
+    this.id = createIdForTag(id, children);
+  }
+
   componentDidMount() {
     this.setCorrectTag();
   }
 
   componentDidUpdate() {
+    const {
+      children
+    } = this.props;
+
+    setCacheId(this.id, children);
+
     this.setCorrectTag();
   }
 
   componentWillUnmount() {
     this.removeTagFromHead('link');
     this.removeTagFromHead('style');
+
+    if (!isNull(this.id)) {
+      removeIdFromCache(this.id);
+    }
   }
+
+  id = null;
 
   shouldComponentUpdate({children: nextChildren}) {
     const {
@@ -108,17 +121,19 @@ class Style extends Component {
     const {
       hasSourceMap
     } = this.props;
-    
-    const {
-      hasSourceMap: hasSourceMapGlobal
-    } = REACT_STYLE_TAG_GLOBAL_PROPERTIES;
-    
-    const hasSourceMapFinal = getCoalescedPropsValue(hasSourceMap, hasSourceMapGlobal);
 
-    if (hasSourceMapFinal) {
-      this.setLinkTag();
-    } else {
-      this.setStyleTag();
+    if (!isNull(this.id)) {
+      const {
+        hasSourceMap: hasSourceMapGlobal
+      } = REACT_STYLE_TAG_GLOBAL_PROPERTIES;
+
+      const hasSourceMapFinal = getCoalescedPropsValue(hasSourceMap, hasSourceMapGlobal);
+
+      if (hasSourceMapFinal) {
+        this.setLinkTag();
+      } else {
+        this.setStyleTag();
+      }
     }
   };
 
@@ -136,7 +151,7 @@ class Style extends Component {
 
     this.removeTagFromHead('style');
 
-    if (hasBlobSupport) {
+    if (HAS_BLOB_SUPPORT) {
       const {
         doNotPrefix: doNotPrefixGlobal,
         isMinified: isMinifiedGlobal
@@ -155,7 +170,7 @@ class Style extends Component {
 
       document.head.appendChild(link);
     } else {
-      throw new Error(noBlobSupportError);
+      throw new Error(NO_BLOB_SUPPORT_ERROR);
     }
   };
 
@@ -189,10 +204,15 @@ class Style extends Component {
   };
 
   render() {
+    if (isNull(this.id)) {
+      return null;
+    }
+
     const {
       children,
       doNotPrefix: doNotPrefixIgnored,
       hasSourceMap,
+      id: idIgnored,
       isMinified: isMinifiedIgnored,
       ...otherProps
     } = this.props;
@@ -203,9 +223,10 @@ class Style extends Component {
 
     const hasSourceMapFinal = getCoalescedPropsValue(hasSourceMap, hasSourceMapGlobal);
 
-    if (hasSourceMapFinal && hasBlobSupport) {
+    if (hasSourceMapFinal && HAS_BLOB_SUPPORT) {
       return (
         <link
+          id={this.id}
           rel="stylesheet"
           ref="link"
           {...otherProps}
@@ -215,6 +236,7 @@ class Style extends Component {
 
     return (
       <style
+        id={this.id}
         ref="style"
         {...otherProps}
       >
