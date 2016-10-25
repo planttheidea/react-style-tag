@@ -1,11 +1,7 @@
 // external dependencies
 import autoprefixer from 'autoprefixer';
+import isUndefined from 'lodash/isUndefined';
 import postcss from 'postcss';
-
-// checkers
-import {
-  isUndefined
-} from './is';
 
 const prefixer = postcss([
   autoprefixer({

@@ -14,6 +14,6 @@ support it. Please import the included polyfill at 'react-style-tag/blob-polyfil
 `).replace(/\r?\n|\r/, '');
 const ONLY_TEXT_ERROR = 'The only type of child that can be used in the <Style/> tag is text.';
 
-export {HAS_BLOB_SUPPORT as hasBlobSupport};
-export {NO_BLOB_SUPPORT_ERROR as noBlobSupportError};
-export {ONLY_TEXT_ERROR as onlyTextError};
+export {HAS_BLOB_SUPPORT};
+export {NO_BLOB_SUPPORT_ERROR};
+export {ONLY_TEXT_ERROR};

@@ -9,11 +9,8 @@ import {
 } from 'react-dom';
 
 import Style, {
-  hashKeys,
-  minifyCss
+  hashKeys
 } from '../src';
-
-console.log(minifyCss);
 
 const keys = [
   'test',
@@ -44,14 +41,31 @@ Style.setGlobalOptions({
   hasSourceMap: true
 });
 
+const RegularDiv = ({color}) => {
+  return (
+    <div>
+      <div className={foo}>
+        I do not toggle
+      </div>
+
+      <Style>{`
+        .${foo} {
+          color: ${color};
+          transition: color 250ms ease-in-out;
+        }
+      `}</Style>
+    </div>
+  );
+};
+
 const ToggledDiv = ({color}) => {
   return (
     <div>
       <div className={test}>
-        I am display inline-block
+        I toggle
       </div>
 
-      <Style id="custom-style-block">{`
+      <Style id="custom-style-tag">{`
         .${test} {
           color: ${color};
           display: inline-flex;
@@ -106,6 +120,16 @@ class App extends Component {
 
         <br/>
 
+        <RegularDiv color={color}/>
+
+        <br/>
+
+        {isToggledDivShown && (
+          <ToggledDiv color={color}/>
+        )}
+
+        <br/>
+
         {isToggledDivShown && (
           <ToggledDiv color={color}/>
         )}
@@ -122,7 +146,7 @@ setInterval(() => {
   render((
     <App color={getRandomColor()}/>
   ), div);
-}, 1000);
+}, 2500);
 
 render((
   <App color={getRandomColor()}/>
