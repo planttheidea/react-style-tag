@@ -1,5 +1,5 @@
-const URL = window.URL || window.webkitURL;
-const HAS_BLOB_SUPPORT = !!(window.Blob && typeof window.Blob === 'function' && URL.createObjectURL) && ((win) => {
+const URL = typeof window !== 'undefined' ? (window.URL || window.webkitURL) : {};
+const HAS_BLOB_SUPPORT = !!(typeof window !== 'undefined' && window.Blob && typeof window.Blob === 'function' && URL.createObjectURL) && function (win) { => {
     try {
       new win.Blob;
 
@@ -9,7 +9,7 @@ const HAS_BLOB_SUPPORT = !!(window.Blob && typeof window.Blob === 'function' && 
     }
   })(window);
 const NO_BLOB_SUPPORT_ERROR = (`
-To support sourcemaps for react-style-tag you need Blob support, and the browser you are using does not currently 
+To support sourcemaps for react-style-tag you need Blob support, and the browser you are using does not currently
 support it. Please import the included polyfill at 'react-style-tag/blob-polyfill.js'.
 `).replace(/\r?\n|\r/, '');
 const ONLY_TEXT_ERROR = 'The only type of child that can be used in the <Style/> tag is text.';
