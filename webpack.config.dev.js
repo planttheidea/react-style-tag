@@ -27,7 +27,7 @@ module.exports = {
   devtool: '#source-map',
 
   entry: [
-    path.resolve (__dirname, 'DEV_ONLY', 'App.js')
+    path.resolve(__dirname, 'DEV_ONLY', 'App.js')
   ],
 
   module: {
@@ -35,7 +35,7 @@ module.exports = {
       {
         enforce: 'pre',
         include: [
-            path.resolve(__dirname, 'src')
+          path.resolve(__dirname, 'src')
         ],
         loader: 'eslint-loader',
         options: {
@@ -46,13 +46,13 @@ module.exports = {
         },
         test: /\.js$/
       }, {
-          include: [
-            path.resolve(__dirname, 'src'),
-            path.resolve(__dirname, 'DEV_ONLY')
-          ],
-          loader: 'babel-loader',
-          test: /\.js$/
-        }
+        include: [
+          path.resolve(__dirname, 'src'),
+          path.resolve(__dirname, 'DEV_ONLY')
+        ],
+        loader: 'babel-loader',
+        test: /\.js$/
+      }
     ]
   },
 
@@ -70,7 +70,7 @@ module.exports = {
 
   plugins: [
     new webpack.EnvironmentPlugin([
-        'NODE_ENV'
+      'NODE_ENV'
     ]),
     new HtmlWebpackPlugin()
   ]
