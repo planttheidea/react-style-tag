@@ -58,5 +58,5 @@
     "start": "npm run dev",
     "transpile": "babel src --out-dir lib"
   },
-  "version": "1.3.0"
+  "version": "1.3.1"
 }
