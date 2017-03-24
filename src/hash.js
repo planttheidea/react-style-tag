@@ -1,12 +1,15 @@
 let counter = 0;
 
 /**
+ * @function hash
+ *
+ * @description
  * simple bitwise hash of string value
  *
  * @param {string} key ASCII only
  * @return {number} 32-bit positive integer hash
  */
-const hash = (key) => {
+export const hash = (key) => {
   const stringToHash = `${key}-${counter}`;
 
   let hashValue = 5381,
@@ -20,12 +23,15 @@ const hash = (key) => {
 };
 
 /**
+ * @function hashKeys
+ *
+ * @description
  * return map with hashed keys associated to their original values
  *
  * @param {array<string>} keys=[]
  * @returns {object}
  */
-const hashKeys = (keys = []) => {
+export const hashKeys = (keys = []) => {
   const length = keys.length;
 
   let hashMap = {},

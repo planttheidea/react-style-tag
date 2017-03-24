@@ -1,9 +1,10 @@
-.idea/
-DEV_ONLY/
-node_modules/
-src/
+.idea
+DEV_ONLY
+node_modules
+src
 .babelrc
 .eslintrc
 .gitignore
 .npmignore
 webpack.config.dev.js
+yarn.lock
