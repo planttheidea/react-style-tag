@@ -46,7 +46,7 @@ class App extends Component {
         <h1 className="foo">
           Bar
         </h1>
-        
+
         <Style>{`
           .foo {
             color: red;
@@ -82,33 +82,33 @@ const {
 class App extends Component {
   render() {
     return (
-        <div>
-          <div className={foo}>
-            My text is red due to the scoped style of foo.
-          </div>
-          
-          <div className={bar}>
-            My text is green due to the scoped style of bar.
-          </div>
-          
-          <div className="baz">
-            My text is blue due to the global style of baz.
-          </div>
-          
-          <Style>{`
-            .${foo} {
-              color: red;
-            }
-            
-            .${bar} {
-              color: green;
-            }
-            
-            .baz {
-              color: blue;
-            }
-          `}</Style>
+      <div>
+        <div className={foo}>
+          My text is red due to the scoped style of foo.
         </div>
+
+        <div className={bar}>
+          My text is green due to the scoped style of bar.
+        </div>
+
+        <div className="baz">
+          My text is blue due to the global style of baz.
+        </div>
+
+        <Style>{`
+          .${foo} {
+            color: red;
+          }
+
+          .${bar} {
+            color: green;
+          }
+
+          .baz {
+            color: blue;
+          }
+        `}</Style>
+      </div>
     );
   }
 }
@@ -164,9 +164,9 @@ All of the props available are also available as global options for all instance
 import Style from 'react-style-tag';
 
 Style.setGlobalOptions({
-    doNotPrefix: true,
-    hasSourceMap: true,
-    isMinified: true
+  doNotPrefix: true,
+  hasSourceMap: true,
+  isMinified: true
 });
 ```
 
@@ -176,8 +176,8 @@ All default values are the same as those available for props. A common use case 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 Style.setGlobalOptions({
-    hasSourceMap: !IS_PRODUCTION,
-    isMinified: IS_PRODUCTION
+  hasSourceMap: !IS_PRODUCTION,
+  isMinified: IS_PRODUCTION
 });
 
 <Style>
@@ -202,11 +202,11 @@ Additionally, PostCSS makes heavy use of JSON internally, so you will likely nee
 ### Development
 
 Standard stuff, clone the repo and `npm i` to get the dependencies. npm scripts available:
-* `compile-for-publish` => runs the `lint` and `transpile` scripts
 * `dev` => runs the webpack dev server for the playground
 * `lint` => runs ESLint against files in the `src` folder
-* `prepublish` => if in publish, runs `compile-for-publish`
+* `prepublish` => if in publish, runs `prepublish:compileh`
+* `prepublish:compileh` => runs the `lint` and `transpile` scripts
 * `transpile` => runs Babel against files in `src` to files in `lib`
 
 #### Todo
-* Add tests with Enzyme / Tape
+* Add tests with AVA / Enzyme
