@@ -7,30 +7,33 @@
     "autoprefixer": "^6.4.0",
     "blob-polyfill": "^1.0.20150320",
     "lodash": "^4.16.4",
-    "node-uuid": "^1.4.7",
+    "moize": "^2.2.3",
     "postcss": "^5.1.2",
-    "react": ">=15.0.0"
+    "react": ">=15.0.0",
+    "uuid": "^3.0.1"
   },
   "description": "Write scoped, autoprefixed styles declaratively in React",
   "devDependencies": {
-    "babel": "6.5.2",
-    "babel-cli": "6.18.0",
-    "babel-eslint": "7.0.0",
-    "babel-loader": "6.2.5",
+    "babel": "^6.23.0",
+    "babel-cli": "^6.24.0",
+    "babel-eslint": "^7.2.1",
+    "babel-loader": "^6.4.1",
     "babel-plugin-add-module-exports": "0.2.1",
-    "babel-polyfill": "6.13.0",
-    "babel-preset-latest": "6.16.0",
-    "babel-preset-react": "6.16.0",
-    "babel-preset-stage-2": "6.16.0",
-    "eslint": "3.8.1",
-    "eslint-friendly-formatter": "2.0.6",
-    "eslint-loader": "1.6.0",
-    "html-webpack-plugin": "2.22.0",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-env": "^1.2.2",
+    "babel-preset-latest": "^6.24.0",
+    "babel-preset-react": "^6.23.0",
+    "babel-preset-stage-2": "^6.22.0",
+    "eslint": "^3.18.0",
+    "eslint-config-rapid7": "^2.8.1",
+    "eslint-friendly-formatter": "^2.0.7",
+    "eslint-loader": "^1.7.0",
+    "html-webpack-plugin": "^2.28.0",
     "in-publish": "2.0.0",
     "json-loader": "0.5.4",
-    "react-dom": "15.3.1",
-    "webpack": "1.13.2",
-    "webpack-dev-server": "1.16.2"
+    "react-dom": "^15.4.2",
+    "webpack": "^2.3.1",
+    "webpack-dev-server": "^2.4.2"
   },
   "homepage": "https://github.com/planttheidea/react-style-tag#readme",
   "keywords": [
@@ -48,11 +51,12 @@
     "url": "git+https://github.com/planttheidea/react-style-tag.git"
   },
   "scripts": {
-    "compile-for-publish": "npm run lint && npm run transpile",
-    "dev": "NODE_ENV=development node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --colors --config=webpack.config.dev.js",
-    "lint": "NODE_ENV=test node ./node_modules/eslint/bin/eslint.js src",
-    "prepublish": "in-publish && npm run compile-for-publish || in-install",
-    "transpile": "node ./node_modules/babel-cli/lib/babel/index.js -d lib/ src/"
+    "dev": "NODE_ENV=development webpack-dev-server --progress --colors --config=webpack.config.dev.js",
+    "lint": "NODE_ENV=test eslint src",
+    "prepublish": "in-publish && npm run prepublish:compile || echo",
+    "prepublish:compile": "npm run lint && npm run transpile",
+    "start": "npm run dev",
+    "transpile": "babel src --out-dir lib"
   },
-  "version": "1.3.0"
+  "version": "1.3.1"
 }

@@ -1,5 +1,8 @@
 # react-style-tag CHANGELOG
 
+#### 1.3.1
+* Support SSR by not assigning blob support until componentWillMount (will attempt until `hasBlobSupport` is true, so both server and client calls will run)
+
 #### 1.3.0
 * Add caching to prevent duplicate tags from being added to head
 

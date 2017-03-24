@@ -10,27 +10,29 @@ const prefixer = postcss([
 ]);
 
 /**
+ * @function getCoalescedPropsValue
+ *
+ * @description
  * return the propsValue if it exists, else return the defaultValue
  *
  * @param {boolean} propsValue
  * @param {boolean} defaultValue
  * @returns {boolean}
  */
-const getCoalescedPropsValue = (propsValue, defaultValue) => {
-  if (isUndefined(propsValue)) {
-    return defaultValue;
-  }
-
-  return propsValue;
+export const getCoalescedPropsValue = (propsValue, defaultValue) => {
+  return isUndefined(propsValue) ? defaultValue : propsValue;
 };
 
 /**
+ * @function minify
+ *
+ * @description
  * return the minified string css
  *
  * @param {string} cssText
  * @returns {string}
  */
-const minify = (cssText) => {
+export const minify = (cssText) => {
   return cssText.trim()
     .replace(/\/\*[\s\S]+?\*\//g, '')
     .replace(/[\n\r]/g, '')
@@ -46,16 +48,22 @@ const minify = (cssText) => {
 };
 
 /**
+ * @function prefixCss
+ *
+ * @description
  * return the css after running through autoprefixer
  *
  * @param {string} cssText
  * @returns {string}
  */
-const prefixCss = (cssText) => {
+export const prefixCss = (cssText) => {
   return prefixer.process(cssText).css;
 };
 
 /**
+ * @function getTransformedCss
+ *
+ * @description
  * get the (if applicable) prefixed and minified css based on the
  * original cssText
  *
@@ -64,13 +72,8 @@ const prefixCss = (cssText) => {
  * @param {boolean} isMinified=false
  * @returns {string}
  */
-const getTransformedCss = (cssText, doNotPrefix = false, isMinified = false) => {
+export const getTransformedCss = (cssText, doNotPrefix = false, isMinified = false) => {
   const transformedCss = doNotPrefix ? cssText : prefixCss(cssText);
 
   return isMinified ? minify(transformedCss) : transformedCss;
 };
-
-export {getCoalescedPropsValue};
-export {getTransformedCss};
-export {minify};
-export {prefixCss};

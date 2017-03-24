@@ -19,7 +19,6 @@ const keys = [
 ];
 
 const {
-  bar,
   foo,
   test
 } = hashKeys(keys);
@@ -58,14 +57,18 @@ const RegularDiv = ({color}) => {
   );
 };
 
-const ToggledDiv = ({color}) => {
+RegularDiv.propTypes = {
+  color: PropTypes.string
+};
+
+const ToggledDiv = ({color, id}) => {
   return (
     <div>
       <div className={test}>
         I toggle
       </div>
 
-      <Style id="custom-style-tag">{`
+      <Style id={id}>{`
         .${test} {
           color: ${color};
           display: inline-flex;
@@ -80,6 +83,11 @@ const ToggledDiv = ({color}) => {
       `}</Style>
     </div>
   );
+};
+
+ToggledDiv.propTypes = {
+  color: PropTypes.string,
+  id: PropTypes.string
 };
 
 class App extends Component {
@@ -125,13 +133,19 @@ class App extends Component {
         <br/>
 
         {isToggledDivShown && (
-          <ToggledDiv color={color}/>
+          <ToggledDiv
+            color={color}
+            id="toggle-one"
+          />
         )}
 
         <br/>
 
         {isToggledDivShown && (
-          <ToggledDiv color={color}/>
+          <ToggledDiv
+            color={color}
+            id="toggle-two"
+          />
         )}
       </div>
     );
