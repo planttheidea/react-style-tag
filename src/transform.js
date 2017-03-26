@@ -1,13 +1,11 @@
 // external dependencies
-import autoprefixer from 'autoprefixer';
+import compose from 'lodash/fp/compose';
 import isUndefined from 'lodash/isUndefined';
-import postcss from 'postcss';
 
-const prefixer = postcss([
-  autoprefixer({
-    remove: false
-  })
-]);
+// constants
+import {
+  PREFIXER
+} from './constants';
 
 /**
  * @function getCoalescedPropsValue
@@ -57,8 +55,19 @@ export const minify = (cssText) => {
  * @returns {string}
  */
 export const prefixCss = (cssText) => {
-  return prefixer.process(cssText).css;
+  return PREFIXER.process(cssText).css;
 };
+
+/**
+ * @function prefixAndMinifyCss
+ *
+ * @description
+ * return the css after running through autoprefixer and minify
+ *
+ * @param {string} cssText
+ * @returns {string}
+ */
+export const prefixAndMinifyCss = compose(minify, prefixCss);
 
 /**
  * @function getTransformedCss
@@ -73,7 +82,11 @@ export const prefixCss = (cssText) => {
  * @returns {string}
  */
 export const getTransformedCss = (cssText, doNotPrefix = false, isMinified = false) => {
-  const transformedCss = doNotPrefix ? cssText : prefixCss(cssText);
+  if (!isMinified) {
+    return doNotPrefix ? cssText : prefixCss(cssText);
+  }
 
-  return isMinified ? minify(transformedCss) : transformedCss;
+  const transformCss = doNotPrefix ? minify : prefixAndMinifyCss;
+
+  return transformCss(cssText);
 };

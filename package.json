@@ -1,5 +1,20 @@
 {
   "author": "planttheidea",
+  "ava": {
+    "babel": "inherit",
+    "concurrency": 5,
+    "failFast": true,
+    "files": [
+      "test/*.js",
+      "!test/helpers/*.js"
+    ],
+    "require": [
+      "babel-register",
+      "babel-polyfill",
+      "./test/helpers/setup-browser-env.js"
+    ],
+    "verbose": true
+  },
   "bugs": {
     "url": "https://github.com/planttheidea/react-style-tag/issues"
   },
@@ -14,8 +29,9 @@
   },
   "description": "Write scoped, autoprefixed styles declaratively in React",
   "devDependencies": {
-    "babel": "^6.23.0",
+    "ava": "^0.18.2",
     "babel-cli": "^6.24.0",
+    "babel-core": "^6.24.0",
     "babel-eslint": "^7.2.1",
     "babel-loader": "^6.4.1",
     "babel-plugin-add-module-exports": "0.2.1",
@@ -24,6 +40,10 @@
     "babel-preset-latest": "^6.24.0",
     "babel-preset-react": "^6.23.0",
     "babel-preset-stage-2": "^6.22.0",
+    "babel-register": "^6.24.0",
+    "browser-env": "^2.0.25",
+    "enzyme": "^2.8.0",
+    "enzyme-to-json": "^1.5.0",
     "eslint": "^3.18.0",
     "eslint-config-rapid7": "^2.8.1",
     "eslint-friendly-formatter": "^2.0.7",
@@ -31,8 +51,11 @@
     "html-webpack-plugin": "^2.28.0",
     "in-publish": "2.0.0",
     "json-loader": "0.5.4",
+    "nyc": "^10.1.2",
+    "react-addons-test-utils": "^15.4.2",
     "react-dom": "^15.4.2",
-    "webpack": "^2.3.1",
+    "sinon": "^2.1.0",
+    "webpack": "^2.3.2",
     "webpack-dev-server": "^2.4.2"
   },
   "homepage": "https://github.com/planttheidea/react-style-tag#readme",
@@ -54,9 +77,13 @@
     "dev": "NODE_ENV=development webpack-dev-server --progress --colors --config=webpack.config.dev.js",
     "lint": "NODE_ENV=test eslint src",
     "prepublish": "in-publish && npm run prepublish:compile || echo",
-    "prepublish:compile": "npm run lint && npm run transpile",
+    "prepublish:compile": "npm run lint && npm run test:coverage && npm run transpile",
     "start": "npm run dev",
+    "test": "NODE_PATH=. NODE_ENV=test ava --no-cache",
+    "test:coverage": "nyc npm test",
+    "test:watch": "NODE_PATH=. NODE_ENV=test ava --watch",
+    "test:update": "NODE_PATH=. NODE_ENV=test ava --update-snapshots",
     "transpile": "babel src --out-dir lib"
   },
-  "version": "1.3.1"
+  "version": "1.3.2"
 }

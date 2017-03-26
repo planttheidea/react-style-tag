@@ -1,5 +1,8 @@
 # react-style-tag CHANGELOG
 
+#### 1.3.2
+* Add complete test coverage
+
 #### 1.3.1
 * Support SSR by not assigning blob support until componentWillMount (will attempt until `hasBlobSupport` is true, so both server and client calls will run)
 

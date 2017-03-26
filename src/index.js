@@ -2,16 +2,18 @@
 import Style from './Style';
 
 // hash
-import hashKeys from './hash';
+import {
+  hashKeys
+} from './hash';
 
 // transform
 import {
-  minify as minifyCss,
+  minify,
   prefixCss
 } from './transform';
 
 export {hashKeys};
-export {minifyCss};
+export {minify as minifyCss};
 export {prefixCss};
 
 export default Style;
