@@ -1,3 +1,7 @@
+// external dependencies
+import autoprefixer from 'autoprefixer';
+import postcss from 'postcss';
+
 /**
  * @constant {Object} REACT_STYLE_TAG_GLOBAL_PROPERTIES
  */
@@ -21,3 +25,12 @@ support it. Please import the included polyfill at 'react-style-tag/blob-polyfil
  * @default
  */
 export const ONLY_TEXT_ERROR = 'The only type of child that can be used in the <Style/> tag is text.';
+
+/**
+ * @constants {Object} PREFIXER
+ */
+export const PREFIXER = postcss([
+  autoprefixer({
+    remove: false
+  })
+]);

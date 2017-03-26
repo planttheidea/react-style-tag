@@ -1,0 +1,3 @@
+exports[`if Style will render correctly when using a link tag 1`] = `"{"__ava_react_jsx":{"type":"link","props":{"id":"foo","rel":"stylesheet"},"children":null}}"`;
+
+exports[`if Style will render correctly when using a style tag 1`] = `"{\"__ava_react_jsx\":{\"type\":\"style\",\"props\":{\"id\":\"foo\"},\"children\":null}}"`;

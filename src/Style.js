@@ -9,6 +9,11 @@ import React, {
 
 // local utils
 import {
+  createIdForTag,
+  removeIdFromCache,
+  setCacheId
+} from './cache';
+import {
   DEFAULT_REACT_STYLE_TAG_GLOBAL_PROPERTIES,
   NO_BLOB_SUPPORT_ERROR
 } from './constants';
@@ -17,11 +22,8 @@ import {
   getTransformedCss
 } from './transform';
 import {
-  createIdForTag,
   getHasBlobSupport,
   getUrl,
-  removeIdFromCache,
-  setCacheId,
   throwErrorIfIsNotText
 } from './utils';
 
@@ -267,6 +269,7 @@ export const createSetStyleTag = (instance) => {
  * @param {boolean} [options.doNotPrefix]
  * @param {boolean} [options.hasSourceMap]
  * @param {boolean} [options.isMinified]
+ * @returns {Object} globalProperties
  */
 export const setGlobalOptions = (options) => {
   Object.keys(options).forEach((option) => {
@@ -278,6 +281,8 @@ export const setGlobalOptions = (options) => {
       globalProperties[option] = options[option];
     }
   });
+
+  return globalProperties;
 };
 
 class Style extends Component {
