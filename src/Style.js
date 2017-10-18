@@ -1,5 +1,4 @@
 // external dependencies
-import isBoolean from 'lodash/isBoolean';
 import isNull from 'lodash/isNull';
 import moize from 'moize';
 import React, {
@@ -194,7 +193,8 @@ export const createSetLinkTag = (instance) => {
     const {
       children,
       doNotPrefix,
-      isMinified
+      isMinified,
+      autoPrefixerOpts
     } = instance.props;
 
     throwErrorIfIsNotText(children);
@@ -207,12 +207,15 @@ export const createSetLinkTag = (instance) => {
 
     const {
       doNotPrefix: doNotPrefixGlobal,
-      isMinified: isMinifiedGlobal
+      isMinified: isMinifiedGlobal,
+      autoPrefixerOpts: autoPrefixerOptsGlobal
     } = globalProperties;
 
     const doNotPrefixFinal = instance.getCoalescedPropsValue(doNotPrefix, doNotPrefixGlobal);
     const isMinifiedFinal = instance.getCoalescedPropsValue(isMinified, isMinifiedGlobal);
-    const transformedCss = getTransformedCss(children, doNotPrefixFinal, isMinifiedFinal);
+    // not using memoized version for autoPrefixerOpts as memoizing object will be more expensive than undefined check
+    const autoPrefixerOptsFinal = getCoalescedPropsValue(autoPrefixerOpts, autoPrefixerOptsGlobal);
+    const transformedCss = getTransformedCss(children, doNotPrefixFinal, isMinifiedFinal, autoPrefixerOptsFinal);
 
     const link = instance.link;
     const blob = new window.Blob([transformedCss], {
@@ -236,12 +239,14 @@ export const createSetStyleTag = (instance) => {
     const {
       children,
       doNotPrefix,
-      isMinified
+      isMinified,
+      autoPrefixerOpts
     } = instance.props;
 
     const {
       doNotPrefix: doNotPrefixGlobal,
-      isMinified: isMinifiedGlobal
+      isMinified: isMinifiedGlobal,
+      autoPrefixerOpts: autoPrefixerOptsGlobal
     } = globalProperties;
 
     throwErrorIfIsNotText(children);
@@ -250,10 +255,12 @@ export const createSetStyleTag = (instance) => {
 
     const doNotPrefixFinal = instance.getCoalescedPropsValue(doNotPrefix, doNotPrefixGlobal);
     const isMinifiedFinal = instance.getCoalescedPropsValue(isMinified, isMinifiedGlobal);
+    // not using memoized version for autoPrefixerOpts as memoizing object will be more expensive than undefined check
+    const autoPrefixerOptsFinal = instance.getCoalescedPropsValue(autoPrefixerOpts, autoPrefixerOptsGlobal);
 
     const style = instance.style;
 
-    style.textContent = getTransformedCss(children, doNotPrefixFinal, isMinifiedFinal);
+    style.textContent = getTransformedCss(children, doNotPrefixFinal, isMinifiedFinal, autoPrefixerOptsFinal);
 
     document.head.appendChild(style);
   };
@@ -269,15 +276,12 @@ export const createSetStyleTag = (instance) => {
  * @param {boolean} [options.doNotPrefix]
  * @param {boolean} [options.hasSourceMap]
  * @param {boolean} [options.isMinified]
+ * @param {object} [options.autoPrefixerOpts]
  * @returns {Object} globalProperties
  */
 export const setGlobalOptions = (options) => {
   Object.keys(options).forEach((option) => {
     if (globalProperties.hasOwnProperty(option)) {
-      if (!isBoolean(options[option])) {
-        throw new TypeError(`${option} must be a boolean value.`);
-      }
-
       globalProperties[option] = options[option];
     }
   });
@@ -291,7 +295,22 @@ class Style extends Component {
     doNotPrefix: PropTypes.bool,
     hasSourceMap: PropTypes.bool,
     id: PropTypes.string,
-    isMinified: PropTypes.bool
+    isMinified: PropTypes.bool,
+    autoPrefixerOpts: PropTypes.shape({
+      // shape defined by autoprefixer options documentation at https://www.npmjs.com/package/autoprefixer
+      browsers: PropTypes.array,
+      env: PropTypes.string,
+      cascade: PropTypes.bool,
+      add: PropTypes.bool,
+      remove: PropTypes.bool,
+      supports: PropTypes.bool,
+      flexbox: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.bool
+      ]),
+      grid: PropTypes.bool,
+      stats: PropTypes.object
+    })
   };
 
   // lifecycle methods
@@ -330,6 +349,7 @@ class Style extends Component {
       hasSourceMap,
       id: idIgnored,
       isMinified: isMinifiedIgnored,
+      autoPrefixerOpts: autoPrefixerOptsIgnored,
       ...otherProps
     } = this.props;
 

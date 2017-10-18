@@ -1,11 +1,29 @@
 // external dependencies
 import compose from 'lodash/fp/compose';
+import isEqual from 'lodash/isEqual';
 import isUndefined from 'lodash/isUndefined';
+import moize from 'moize';
+import autoprefixer from 'autoprefixer';
+import postcss from 'postcss';
 
 // constants
-import {
-  PREFIXER
-} from './constants';
+import {DEFAULT_AUTOPREFIXER_OPTS} from './constants';
+
+/**
+ * @function getAutoPrefixer
+ *
+ * @description
+ * Function that returns an autoprefixer instance configured with the provided options.
+ * Memoized for better performance (uses lodash isEqual for equality check)
+ *
+ * @param {object} options
+ * @returns {object}
+ */
+export const getAutoPrefixer = moize((autoPrefixerOpts) => {
+  return postcss([
+    autoprefixer(autoPrefixerOpts)
+  ]);
+}, {equals: isEqual});
 
 /**
  * @function getCoalescedPropsValue
@@ -52,10 +70,11 @@ export const minify = (cssText) => {
  * return the css after running through autoprefixer
  *
  * @param {string} cssText
+ * @param {object} autoPrefixerOpts
  * @returns {string}
  */
-export const prefixCss = (cssText) => {
-  return PREFIXER.process(cssText).css;
+export const prefixCss = (cssText, autoPrefixerOpts) => {
+  return getAutoPrefixer(autoPrefixerOpts).process(cssText).css;
 };
 
 /**
@@ -79,14 +98,18 @@ export const prefixAndMinifyCss = compose(minify, prefixCss);
  * @param {string} cssText
  * @param {boolean} doNotPrefix=false
  * @param {boolean} isMinified=false
+ * @param {object} autoPrefixerOpts=
  * @returns {string}
  */
-export const getTransformedCss = (cssText, doNotPrefix = false, isMinified = false) => {
+export const getTransformedCss = (
+  cssText,
+  doNotPrefix = false,
+  isMinified = false,
+  autoPrefixerOpts = DEFAULT_AUTOPREFIXER_OPTS
+) => {
   if (!isMinified) {
-    return doNotPrefix ? cssText : prefixCss(cssText);
+    return doNotPrefix ? cssText : prefixCss(cssText, autoPrefixerOpts);
   }
 
-  const transformCss = doNotPrefix ? minify : prefixAndMinifyCss;
-
-  return transformCss(cssText);
+  return doNotPrefix ? minify(cssText) : prefixAndMinifyCss(cssText, autoPrefixerOpts);
 };

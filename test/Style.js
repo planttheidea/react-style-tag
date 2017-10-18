@@ -292,7 +292,8 @@ test.serial('if createSetLinkTag will create a link tag with the correct values'
     props: {
       children: 'foo',
       doNotPrefix: false,
-      isMinified: false
+      isMinified: false,
+      autoPrefixerOpts: constants.DEFAULT_AUTOPREFIXER_OPTS
     },
     removeTagFromHead: sinon.spy()
   };
@@ -347,7 +348,8 @@ test.serial('if createSetStyleTag will create a link tag with the correct values
     props: {
       children: 'foo',
       doNotPrefix: false,
-      isMinified: false
+      isMinified: false,
+      autoPrefixerOpts: constants.DEFAULT_AUTOPREFIXER_OPTS
     },
     removeTagFromHead: sinon.spy()
   };
@@ -429,7 +431,11 @@ test('if setGlobalOptions have the correct defaults', (t) => {
 test('if setGlobalOptions will set the global properties based on the options passed', (t) => {
   const overrides = {
     doNotPrefix: true,
-    isMinified: true
+    isMinified: true,
+    autoPrefixerOpts: {
+      flexbox: true,
+      grid: true
+    }
   };
 
   const result = component.setGlobalOptions(overrides);
@@ -437,18 +443,12 @@ test('if setGlobalOptions will set the global properties based on the options pa
   t.deepEqual(result, {
     ...constants.DEFAULT_REACT_STYLE_TAG_GLOBAL_PROPERTIES,
     doNotPrefix: true,
-    isMinified: true
+    isMinified: true,
+    autoPrefixerOpts: {
+      flexbox: true,
+      grid: true
+    }
   });
-});
-
-test('if setGlobalOptions will throw a TypeError when an override is not a boolean', (t) => {
-  const overrides = {
-    doNotPrefix: 'foo'
-  };
-
-  t.throws(() => {
-    component.setGlobalOptions(overrides);
-  }, TypeError);
 });
 
 test('if Style will render correctly when using a style tag', (t) => {

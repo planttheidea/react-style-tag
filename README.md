@@ -118,7 +118,7 @@ Notice you can easily mix both scoped and global styles, and for mental mapping 
 
 #### Props
 
-Naturally you can pass all standard attributes (`id`, `name`, etc.) and they will be passed to the `<style>` tag, but there are a couple of additional props that are specific to the component.
+Naturally you can pass all standard attributes (`id`, `name`, etc.) and they will be passed to the `<style>` tag, but there are a few  additional props that are specific to the component.
 
 **doNotPrefix** *boolean, defaults to false*
 
@@ -156,6 +156,10 @@ This would result in:
 <style>.test{display:block}</style>
 ```
 
+**autoPrefixerOpts** *object, defaults to `{ remove: false }`*
+
+This prop can be set to any plain object containing options for the [autoPrefixer](https://www.npmjs.com/package/autoprefixer#options). The autoPrefixer instance generation is memoized, so using the same `autoPrefixerOpts` prop across multiple `Style` components should be performant.
+
 ### Global Options
 
 All of the props available are also available as global options for all instances that can be set with the `setGlobalOptions` method:
@@ -166,7 +170,8 @@ import Style from 'react-style-tag';
 Style.setGlobalOptions({
   doNotPrefix: true,
   hasSourceMap: true,
-  isMinified: true
+  isMinified: true,
+  autoPrefixerOpts: { remove: true }
 });
 ```
 
