@@ -1,6 +1,5 @@
 // external dependencies
 import isNull from 'lodash/isNull';
-import moize from 'moize';
 import React, {
   Component,
   PropTypes
@@ -171,7 +170,7 @@ export const createSetCorrectTag = (instance) => {
         hasSourceMap: hasSourceMapGlobal
       } = globalProperties;
 
-      const hasSourceMapFinal = instance.getCoalescedPropsValue(hasSourceMap, hasSourceMapGlobal);
+      const hasSourceMapFinal = getCoalescedPropsValue(hasSourceMap, hasSourceMapGlobal);
 
       if (hasSourceMapFinal) {
         instance.setLinkTag();
@@ -194,7 +193,7 @@ export const createSetLinkTag = (instance) => {
       children,
       doNotPrefix,
       isMinified,
-      autoPrefixerOpts
+      autoprefixerOptions
     } = instance.props;
 
     throwErrorIfIsNotText(children);
@@ -208,14 +207,13 @@ export const createSetLinkTag = (instance) => {
     const {
       doNotPrefix: doNotPrefixGlobal,
       isMinified: isMinifiedGlobal,
-      autoPrefixerOpts: autoPrefixerOptsGlobal
+      autoprefixerOptions: autoprefixerOptionsGlobal
     } = globalProperties;
 
-    const doNotPrefixFinal = instance.getCoalescedPropsValue(doNotPrefix, doNotPrefixGlobal);
-    const isMinifiedFinal = instance.getCoalescedPropsValue(isMinified, isMinifiedGlobal);
-    // not using memoized version for autoPrefixerOpts as memoizing object will be more expensive than undefined check
-    const autoPrefixerOptsFinal = getCoalescedPropsValue(autoPrefixerOpts, autoPrefixerOptsGlobal);
-    const transformedCss = getTransformedCss(children, doNotPrefixFinal, isMinifiedFinal, autoPrefixerOptsFinal);
+    const doNotPrefixFinal = getCoalescedPropsValue(doNotPrefix, doNotPrefixGlobal);
+    const isMinifiedFinal = getCoalescedPropsValue(isMinified, isMinifiedGlobal);
+    const autoprefixerOptionsFinal = getCoalescedPropsValue(autoprefixerOptions, autoprefixerOptionsGlobal);
+    const transformedCss = getTransformedCss(children, doNotPrefixFinal, isMinifiedFinal, autoprefixerOptionsFinal);
 
     const link = instance.link;
     const blob = new window.Blob([transformedCss], {
@@ -240,27 +238,26 @@ export const createSetStyleTag = (instance) => {
       children,
       doNotPrefix,
       isMinified,
-      autoPrefixerOpts
+      autoprefixerOptions
     } = instance.props;
 
     const {
       doNotPrefix: doNotPrefixGlobal,
       isMinified: isMinifiedGlobal,
-      autoPrefixerOpts: autoPrefixerOptsGlobal
+      autoprefixerOptions: autoprefixerOptionsGlobal
     } = globalProperties;
 
     throwErrorIfIsNotText(children);
 
     instance.removeTagFromHead('link');
 
-    const doNotPrefixFinal = instance.getCoalescedPropsValue(doNotPrefix, doNotPrefixGlobal);
-    const isMinifiedFinal = instance.getCoalescedPropsValue(isMinified, isMinifiedGlobal);
-    // not using memoized version for autoPrefixerOpts as memoizing object will be more expensive than undefined check
-    const autoPrefixerOptsFinal = instance.getCoalescedPropsValue(autoPrefixerOpts, autoPrefixerOptsGlobal);
+    const doNotPrefixFinal = getCoalescedPropsValue(doNotPrefix, doNotPrefixGlobal);
+    const isMinifiedFinal = getCoalescedPropsValue(isMinified, isMinifiedGlobal);
+    const autoprefixerOptionsFinal = getCoalescedPropsValue(autoprefixerOptions, autoprefixerOptionsGlobal);
 
     const style = instance.style;
 
-    style.textContent = getTransformedCss(children, doNotPrefixFinal, isMinifiedFinal, autoPrefixerOptsFinal);
+    style.textContent = getTransformedCss(children, doNotPrefixFinal, isMinifiedFinal, autoprefixerOptionsFinal);
 
     document.head.appendChild(style);
   };
@@ -276,7 +273,7 @@ export const createSetStyleTag = (instance) => {
  * @param {boolean} [options.doNotPrefix]
  * @param {boolean} [options.hasSourceMap]
  * @param {boolean} [options.isMinified]
- * @param {object} [options.autoPrefixerOpts]
+ * @param {object} [options.autoprefixerOptions]
  * @returns {Object} globalProperties
  */
 export const setGlobalOptions = (options) => {
@@ -296,9 +293,9 @@ class Style extends Component {
     hasSourceMap: PropTypes.bool,
     id: PropTypes.string,
     isMinified: PropTypes.bool,
-    autoPrefixerOpts: PropTypes.shape({
+    autoprefixerOptions: PropTypes.shape({
       // shape defined by autoprefixer options documentation at https://www.npmjs.com/package/autoprefixer
-      browsers: PropTypes.array,
+      browsers: PropTypes.arrayOf(PropTypes.string),
       env: PropTypes.string,
       cascade: PropTypes.bool,
       add: PropTypes.bool,
@@ -330,7 +327,6 @@ class Style extends Component {
   static setGlobalOptions = setGlobalOptions;
 
   // instance methods
-  getCoalescedPropsValue = moize(getCoalescedPropsValue);
   removeTagFromHead = createRemoveTagFromHead(this);
   setCorrectTag = createSetCorrectTag(this);
   setLinkRef = createAssignRefToInstance(this, 'link');
@@ -349,7 +345,7 @@ class Style extends Component {
       hasSourceMap,
       id: idIgnored,
       isMinified: isMinifiedIgnored,
-      autoPrefixerOpts: autoPrefixerOptsIgnored,
+      autoprefixerOptions: autoprefixerOptionsIgnored,
       ...otherProps
     } = this.props;
 
@@ -357,7 +353,7 @@ class Style extends Component {
       hasSourceMap: hasSourceMapGlobal
     } = globalProperties;
 
-    const hasSourceMapFinal = this.getCoalescedPropsValue(hasSourceMap, hasSourceMapGlobal);
+    const hasSourceMapFinal = getCoalescedPropsValue(hasSourceMap, hasSourceMapGlobal);
 
     if (hasSourceMapFinal && hasBlobSupport) {
       return (

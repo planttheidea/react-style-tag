@@ -61,14 +61,14 @@ RegularDiv.propTypes = {
   color: PropTypes.string
 };
 
-const CustomAutoPrefixerDiv = ({color}) => {
+const CustomAutoprefixerDiv = ({color}) => {
   return (
     <div>
       <div className={foo}>
         I have no flexbox prefixes
       </div>
 
-      <Style autoPrefixerOpts={{
+      <Style autoprefixerOptions={{
         flexbox: false
       }}>{`
         .${foo} {
@@ -81,7 +81,7 @@ const CustomAutoPrefixerDiv = ({color}) => {
   );
 };
 
-CustomAutoPrefixerDiv.propTypes = {
+CustomAutoprefixerDiv.propTypes = {
   color: PropTypes.string
 };
 
@@ -156,7 +156,7 @@ class App extends Component {
 
         <br/>
 
-        <CustomAutoPrefixerDiv color={color}/>
+        <CustomAutoprefixerDiv color={color}/>
 
         <br/>
 

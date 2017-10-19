@@ -213,7 +213,6 @@ test.serial('if createRemoveTagFromHead will create a method that that gets the 
 
 test('if createSetCorrectTag will call the right tag function based on hasSourceMap being false', (t) => {
   const instance = {
-    getCoalescedPropsValue: sinon.stub().returns(false),
     id: 'foo',
     props: {
       hasSourceMap: undefined
@@ -221,6 +220,7 @@ test('if createSetCorrectTag will call the right tag function based on hasSource
     setLinkTag: sinon.spy(),
     setStyleTag: sinon.spy()
   };
+  const getCoalescedPropsValue = sinon.spy(transform, 'getCoalescedPropsValue');
 
   const setCorrectTag = component.createSetCorrectTag(instance);
 
@@ -228,23 +228,25 @@ test('if createSetCorrectTag will call the right tag function based on hasSource
 
   setCorrectTag();
 
-  t.true(instance.getCoalescedPropsValue.calledOnce);
+  t.true(getCoalescedPropsValue.calledOnce);
 
   t.true(instance.setLinkTag.notCalled);
 
   t.true(instance.setStyleTag.calledOnce);
+
+  transform.getCoalescedPropsValue.restore();
 });
 
 test('if createSetCorrectTag will call the right tag function based on hasSourceMap being true', (t) => {
   const instance = {
-    getCoalescedPropsValue: sinon.stub().returns(true),
     id: 'foo',
     props: {
-      hasSourceMap: undefined
+      hasSourceMap: true
     },
     setLinkTag: sinon.spy(),
     setStyleTag: sinon.spy()
   };
+  const getCoalescedPropsValue = sinon.spy(transform, 'getCoalescedPropsValue');
 
   const setCorrectTag = component.createSetCorrectTag(instance);
 
@@ -252,16 +254,17 @@ test('if createSetCorrectTag will call the right tag function based on hasSource
 
   setCorrectTag();
 
-  t.true(instance.getCoalescedPropsValue.calledOnce);
+  t.true(getCoalescedPropsValue.calledOnce);
 
   t.true(instance.setLinkTag.calledOnce);
 
   t.true(instance.setStyleTag.notCalled);
+
+  transform.getCoalescedPropsValue.restore();
 });
 
 test('if createSetCorrectTag will call nothing if the instance id is null', (t) => {
   const instance = {
-    getCoalescedPropsValue: sinon.stub().returns(true),
     id: null,
     props: {
       hasSourceMap: undefined
@@ -269,6 +272,7 @@ test('if createSetCorrectTag will call nothing if the instance id is null', (t) 
     setLinkTag: sinon.spy(),
     setStyleTag: sinon.spy()
   };
+  const getCoalescedPropsValue = sinon.spy(transform, 'getCoalescedPropsValue');
 
   const setCorrectTag = component.createSetCorrectTag(instance);
 
@@ -276,16 +280,17 @@ test('if createSetCorrectTag will call nothing if the instance id is null', (t) 
 
   setCorrectTag();
 
-  t.true(instance.getCoalescedPropsValue.notCalled);
+  t.true(getCoalescedPropsValue.notCalled);
 
   t.true(instance.setLinkTag.notCalled);
 
   t.true(instance.setStyleTag.notCalled);
+
+  transform.getCoalescedPropsValue.restore();
 });
 
 test.serial('if createSetLinkTag will create a link tag with the correct values', (t) => {
   const instance = {
-    getCoalescedPropsValue: sinon.stub().returns(false),
     link: {
       href: null
     },
@@ -293,7 +298,7 @@ test.serial('if createSetLinkTag will create a link tag with the correct values'
       children: 'foo',
       doNotPrefix: false,
       isMinified: false,
-      autoPrefixerOpts: constants.DEFAULT_AUTOPREFIXER_OPTS
+      autoprefixerOptions: constants.DEFAULT_AUTOPREFIXER_OPTIONS
     },
     removeTagFromHead: sinon.spy()
   };
@@ -341,7 +346,6 @@ test.serial('if createSetLinkTag will create a link tag with the correct values'
 
 test.serial('if createSetStyleTag will create a link tag with the correct values', (t) => {
   const instance = {
-    getCoalescedPropsValue: sinon.stub().returns(false),
     style: {
       textContent: null
     },
@@ -349,7 +353,7 @@ test.serial('if createSetStyleTag will create a link tag with the correct values
       children: 'foo',
       doNotPrefix: false,
       isMinified: false,
-      autoPrefixerOpts: constants.DEFAULT_AUTOPREFIXER_OPTS
+      autoprefixerOptions: constants.DEFAULT_AUTOPREFIXER_OPTIONS
     },
     removeTagFromHead: sinon.spy()
   };
@@ -432,7 +436,7 @@ test('if setGlobalOptions will set the global properties based on the options pa
   const overrides = {
     doNotPrefix: true,
     isMinified: true,
-    autoPrefixerOpts: {
+    autoprefixerOptions: {
       flexbox: true,
       grid: true
     }
@@ -444,7 +448,7 @@ test('if setGlobalOptions will set the global properties based on the options pa
     ...constants.DEFAULT_REACT_STYLE_TAG_GLOBAL_PROPERTIES,
     doNotPrefix: true,
     isMinified: true,
-    autoPrefixerOpts: {
+    autoprefixerOptions: {
       flexbox: true,
       grid: true
     }

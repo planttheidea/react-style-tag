@@ -1,7 +1,7 @@
 /**
- * @constant {Object} DEFAULT_AUTOPREFIXER_OPTS
+ * @constant {Object} DEFAULT_AUTOPREFIXER_OPTIONS
  */
-export const DEFAULT_AUTOPREFIXER_OPTS = {
+export const DEFAULT_AUTOPREFIXER_OPTIONS = {
   remove: false
 };
 
@@ -12,7 +12,7 @@ export const DEFAULT_REACT_STYLE_TAG_GLOBAL_PROPERTIES = {
   doNotPrefix: false,
   hasSourceMap: false,
   isMinified: false,
-  autoPrefixerOpts: DEFAULT_AUTOPREFIXER_OPTS
+  autoprefixerOptions: DEFAULT_AUTOPREFIXER_OPTIONS
 };
 
 

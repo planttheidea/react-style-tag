@@ -156,9 +156,9 @@ This would result in:
 <style>.test{display:block}</style>
 ```
 
-**autoPrefixerOpts** *object, defaults to `{ remove: false }`*
+**autoprefixerOptions** *object, defaults to `{ remove: false }`*
 
-This prop can be set to any plain object containing options for the [autoPrefixer](https://www.npmjs.com/package/autoprefixer#options). The autoPrefixer instance generation is memoized, so using the same `autoPrefixerOpts` prop across multiple `Style` components should be performant.
+This prop can be set to any plain object containing options for the [autoprefixer](https://www.npmjs.com/package/autoprefixer#options). The autoprefixer instance generation is memoized, so using the same `autoprefixerOptions` prop across multiple `Style` components should be performant.
 
 ### Global Options
 
@@ -171,7 +171,7 @@ Style.setGlobalOptions({
   doNotPrefix: true,
   hasSourceMap: true,
   isMinified: true,
-  autoPrefixerOpts: { remove: true }
+  autoprefixerOptions: { remove: true }
 });
 ```
 
