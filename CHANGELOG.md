@@ -1,7 +1,7 @@
 # react-style-tag CHANGELOG
 
 #### 1.4.0
-* Add `autoprefixerOptions` as both instance and global option (provides custom configuration of interal prefixing via `autoprefixer`)
+* Add `autoprefixerOptions` as both instance and global option (provides custom configuration of interal prefixing via `autoprefixer`) - thanks @oasisvali
 
 #### 1.3.2
 * Add complete test coverage
