@@ -158,7 +158,27 @@ This would result in:
 
 **autoprefixerOptions** *object, defaults to `{ remove: false }`*
 
-This prop can be set to any plain object containing options for the [autoprefixer](https://www.npmjs.com/package/autoprefixer#options). The autoprefixer instance generation is memoized, so using the same `autoprefixerOptions` prop across multiple `Style` components should be performant.
+This prop can be set to any plain object containing options for the [autoprefixer](https://www.npmjs.com/package/autoprefixer#options).
+
+The autoprefixer instance generation is memoized, so using the same `autoprefixerOptions` prop across multiple `Style` components should be performant as long as the same object instance is used. So, in the case of multiple `Style` tags with the same autoprefixerOptions:
+
+```
+<Style autoprefixerOptions={{ remove: true }}>{cssText}</Style>
+
+// later in the code - this will cause another autoprefixer instance to be created
+<Style autoprefixerOptions={{ remove: true }}>{cssText}</Style>
+```
+
+A better approach would be to define the options once and reuse the options object.
+
+```
+const AUTOPREFIXER_OPTIONS = {remove: true};
+
+<Style autoprefixerOptions={AUTOPREFIXER_OPTIONS}>{cssText}</Style>
+
+// later in the code - this will reuse the same autoprefixer instance
+<Style autoprefixerOptions={AUTOPREFIXER_OPTIONS}>{cssText}</Style>
+```
 
 ### Global Options
 

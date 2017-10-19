@@ -13,7 +13,7 @@ import {DEFAULT_AUTOPREFIXER_OPTIONS} from './constants';
  *
  * @description
  * Function that returns an autoprefixer instance configured with the provided options.
- * Memoized for better performance (uses lodash isEqual for equality check)
+ * Memoized for better performance
  *
  * @param {object} options
  * @returns {object}
