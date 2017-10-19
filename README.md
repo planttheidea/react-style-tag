@@ -118,7 +118,7 @@ Notice you can easily mix both scoped and global styles, and for mental mapping 
 
 #### Props
 
-Naturally you can pass all standard attributes (`id`, `name`, etc.) and they will be passed to the `<style>` tag, but there are a couple of additional props that are specific to the component.
+Naturally you can pass all standard attributes (`id`, `name`, etc.) and they will be passed to the `<style>` tag, but there are a few  additional props that are specific to the component.
 
 **doNotPrefix** *boolean, defaults to false*
 
@@ -156,6 +156,30 @@ This would result in:
 <style>.test{display:block}</style>
 ```
 
+**autoprefixerOptions** *object, defaults to `{ remove: false }`*
+
+This prop can be set to any plain object containing options for the [autoprefixer](https://www.npmjs.com/package/autoprefixer#options).
+
+The autoprefixer instance generation is memoized, so using the same `autoprefixerOptions` prop across multiple `Style` components should be performant as long as the same object instance is used. So, in the case of multiple `Style` tags with the same autoprefixerOptions:
+
+```
+<Style autoprefixerOptions={{ remove: true }}>{cssText}</Style>
+
+// later in the code - this will cause another autoprefixer instance to be created
+<Style autoprefixerOptions={{ remove: true }}>{cssText}</Style>
+```
+
+A better approach would be to define the options once and reuse the options object.
+
+```
+const AUTOPREFIXER_OPTIONS = {remove: true};
+
+<Style autoprefixerOptions={AUTOPREFIXER_OPTIONS}>{cssText}</Style>
+
+// later in the code - this will reuse the same autoprefixer instance
+<Style autoprefixerOptions={AUTOPREFIXER_OPTIONS}>{cssText}</Style>
+```
+
 ### Global Options
 
 All of the props available are also available as global options for all instances that can be set with the `setGlobalOptions` method:
@@ -166,7 +190,8 @@ import Style from 'react-style-tag';
 Style.setGlobalOptions({
   doNotPrefix: true,
   hasSourceMap: true,
-  isMinified: true
+  isMinified: true,
+  autoprefixerOptions: { remove: true }
 });
 ```
 

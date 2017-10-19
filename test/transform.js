@@ -44,7 +44,7 @@ test.serial('if getTransformedCss returns the prefixed cssText if doNotPrefix is
   const result = transform.getTransformedCss(cssText, doNotPrefix, isMinified);
 
   t.not(result, cssText);
-  t.is(result, transform.prefixCss(cssText));
+  t.is(result, transform.prefixCss(cssText, constants.DEFAULT_AUTOPREFIXER_OPTIONS));
 });
 
 test.serial('if getTransformedCss returns the minified cssText if doNotPrefix is true and isMinified is true', (t) => {
@@ -66,7 +66,18 @@ test.serial('if getTransformedCss returns the prefixed and minified cssText if d
   const result = transform.getTransformedCss(cssText, doNotPrefix, isMinified);
 
   t.not(result, cssText);
-  t.is(result, transform.prefixAndMinifyCss(cssText));
+  t.is(result, transform.prefixAndMinifyCss(cssText, constants.DEFAULT_AUTOPREFIXER_OPTIONS));
+});
+
+test.serial('if getTransformedCss uses autoprefixerOptions for prefixing', (t) => {
+  const cssText = '.foo { display: flex; }';
+  const doNotPrefix = false;
+  const isMinified = false;
+  const autoprefixerOptions = {grid: true, flexbox: false};
+  const result = transform.getTransformedCss(cssText, doNotPrefix, isMinified, autoprefixerOptions);
+
+  t.not(result, transform.prefixCss(cssText, constants.DEFAULT_AUTOPREFIXER_OPTIONS));
+  t.is(result, transform.prefixCss(cssText, autoprefixerOptions));
 });
 
 test('if minify will minify the css text', (t) => {
@@ -87,17 +98,19 @@ test('if minify will minify the css text', (t) => {
   t.is(result, expectedResult);
 });
 
-test.serial('if prefixCss will call the PREFIXER prefix method', (t) => {
-  const stub = sinon.stub(constants.PREFIXER, 'process').returns({
-    css: 'foo'
-  });
+test.serial('if prefixCss calls getAutoprefixer to generate an autoprefixer and uses it', (t) => {
+  // since getAutoprefixer is memoized, lets grab the default autoprefixer
+  const autoprefixerDefault = transform.getAutoprefixer(constants.DEFAULT_AUTOPREFIXER_OPTIONS);
 
   const cssText = '.foo { display: flex; }';
 
-  transform.prefixCss(cssText);
+  const stub = sinon.stub(autoprefixerDefault, 'process').returns({
+    css: 'foo'
+  });
+
+  transform.prefixCss(cssText, constants.DEFAULT_AUTOPREFIXER_OPTIONS);
 
   t.true(stub.calledOnce);
-  t.true(stub.calledWith(cssText));
-
+  t.true(stub.calledWithExactly(cssText));
   stub.restore();
 });

@@ -1,11 +1,28 @@
 // external dependencies
 import compose from 'lodash/fp/compose';
 import isUndefined from 'lodash/isUndefined';
+import moize from 'moize';
+import autoprefixer from 'autoprefixer';
+import postcss from 'postcss';
 
 // constants
-import {
-  PREFIXER
-} from './constants';
+import {DEFAULT_AUTOPREFIXER_OPTIONS} from './constants';
+
+/**
+ * @function getAutoprefixer
+ *
+ * @description
+ * Function that returns an autoprefixer instance configured with the provided options.
+ * Memoized for better performance
+ *
+ * @param {object} options
+ * @returns {object}
+ */
+export const getAutoprefixer = moize((autoprefixerOptions) => {
+  return postcss([
+    autoprefixer(autoprefixerOptions)
+  ]);
+});
 
 /**
  * @function getCoalescedPropsValue
@@ -52,10 +69,11 @@ export const minify = (cssText) => {
  * return the css after running through autoprefixer
  *
  * @param {string} cssText
+ * @param {object} autoprefixerOptions
  * @returns {string}
  */
-export const prefixCss = (cssText) => {
-  return PREFIXER.process(cssText).css;
+export const prefixCss = (cssText, autoprefixerOptions) => {
+  return getAutoprefixer(autoprefixerOptions).process(cssText).css;
 };
 
 /**
@@ -79,14 +97,18 @@ export const prefixAndMinifyCss = compose(minify, prefixCss);
  * @param {string} cssText
  * @param {boolean} doNotPrefix=false
  * @param {boolean} isMinified=false
+ * @param {object} autoprefixerOptions=DEFAULT_AUTOPREFIXER_OPTIONS
  * @returns {string}
  */
-export const getTransformedCss = (cssText, doNotPrefix = false, isMinified = false) => {
+export const getTransformedCss = (
+  cssText,
+  doNotPrefix = false,
+  isMinified = false,
+  autoprefixerOptions = DEFAULT_AUTOPREFIXER_OPTIONS
+) => {
   if (!isMinified) {
-    return doNotPrefix ? cssText : prefixCss(cssText);
+    return doNotPrefix ? cssText : prefixCss(cssText, autoprefixerOptions);
   }
 
-  const transformCss = doNotPrefix ? minify : prefixAndMinifyCss;
-
-  return transformCss(cssText);
+  return doNotPrefix ? minify(cssText) : prefixAndMinifyCss(cssText, autoprefixerOptions);
 };

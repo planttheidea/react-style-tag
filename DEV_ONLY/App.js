@@ -61,6 +61,30 @@ RegularDiv.propTypes = {
   color: PropTypes.string
 };
 
+const CustomAutoprefixerDiv = ({color}) => {
+  return (
+    <div>
+      <div className={foo}>
+        I have no flexbox prefixes
+      </div>
+
+      <Style autoprefixerOptions={{
+        flexbox: false
+      }}>{`
+        .${foo} {
+          color: ${color};
+          display: inline-flex;
+          transition: color 250ms ease-in-out;
+        }
+      `}</Style>
+    </div>
+  );
+};
+
+CustomAutoprefixerDiv.propTypes = {
+  color: PropTypes.string
+};
+
 const ToggledDiv = ({color, id}) => {
   return (
     <div>
@@ -129,6 +153,10 @@ class App extends Component {
         <br/>
 
         <RegularDiv color={color}/>
+
+        <br/>
+
+        <CustomAutoprefixerDiv color={color}/>
 
         <br/>
 
