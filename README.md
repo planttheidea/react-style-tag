@@ -229,8 +229,8 @@ Additionally, PostCSS makes heavy use of JSON internally, so you will likely nee
 Standard stuff, clone the repo and `npm i` to get the dependencies. npm scripts available:
 * `dev` => runs the webpack dev server for the playground
 * `lint` => runs ESLint against files in the `src` folder
-* `prepublish` => if in publish, runs `prepublish:compileh`
-* `prepublish:compileh` => runs the `lint` and `transpile` scripts
+* `prepublish` => if in publish, runs `prepublish:compile`
+* `prepublish:compile` => runs the `lint` and `transpile` scripts
 * `transpile` => runs Babel against files in `src` to files in `lib`
 
 #### Todo

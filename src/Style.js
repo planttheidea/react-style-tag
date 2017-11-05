@@ -1,9 +1,9 @@
 // external dependencies
 import isNull from 'lodash/isNull';
 import React, {
-  Component,
-  PropTypes
+  Component
 } from 'react';
+import PropTypes from 'prop-types';
 
 // local utils
 import {
