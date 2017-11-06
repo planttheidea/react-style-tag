@@ -1,7 +1,6 @@
 // external dependencies
 import compose from 'lodash/fp/compose';
 import isUndefined from 'lodash/isUndefined';
-import moize from 'moize';
 import autoprefixer from 'autoprefixer';
 import postcss from 'postcss';
 
@@ -18,11 +17,22 @@ import {DEFAULT_AUTOPREFIXER_OPTIONS} from './constants';
  * @param {object} options
  * @returns {object}
  */
-export const getAutoprefixer = moize((autoprefixerOptions) => {
-  return postcss([
-    autoprefixer(autoprefixerOptions)
-  ]);
-});
+export const getAutoprefixer = (() => {
+  const cache = {
+    options: null,
+    postcss: null
+  };
+
+  return (autoprefixerOptions) => {
+    if (cache.postcss && cache.options === autoprefixerOptions) {
+      return cache.postcss;
+    }
+
+    cache.options = autoprefixerOptions;
+
+    return (cache.postcss = postcss([autoprefixer(autoprefixerOptions)]));
+  };
+})();
 
 /**
  * @function getCoalescedPropsValue
@@ -48,7 +58,8 @@ export const getCoalescedPropsValue = (propsValue, defaultValue) => {
  * @returns {string}
  */
 export const minify = (cssText) => {
-  return cssText.trim()
+  return cssText
+    .trim()
     .replace(/\/\*[\s\S]+?\*\//g, '')
     .replace(/[\n\r]/g, '')
     .replace(/\s*([:;,{}])\s*/g, '$1')

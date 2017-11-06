@@ -1,9 +1,11 @@
 {
-  "plugins":[],
-  "presets":[
-    ["env", {
-      "loose": true
-    }],
+  "presets": [
+    [
+      "env",
+      {
+        "loose": true
+      }
+    ],
     "react",
     "stage-2"
   ]

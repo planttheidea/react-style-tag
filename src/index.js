@@ -2,15 +2,10 @@
 import Style from './Style';
 
 // hash
-import {
-  hashKeys
-} from './hash';
+import {hashKeys} from './hash';
 
 // transform
-import {
-  minify,
-  prefixCss
-} from './transform';
+import {minify, prefixCss} from './transform';
 
 export {hashKeys};
 export {minify as minifyCss};

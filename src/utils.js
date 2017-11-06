@@ -1,10 +1,8 @@
 // external dependencies
-import isString from 'lodash/fp/isString';
+import isString from 'lodash/isString';
 
 // constants
-import {
-  ONLY_TEXT_ERROR
-} from './constants';
+import {ONLY_TEXT_ERROR} from './constants';
 
 /**
  * @function getUrl
