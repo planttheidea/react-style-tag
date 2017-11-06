@@ -1,5 +1,10 @@
 # react-style-tag CHANGELOG
 
+#### 1.4.1
+* Use `prop-types` package instead of `React.PropTypes` for React 16 support
+* Move `react` to `peerDependencies`
+* Remove `moize` dependency for simple memoization
+
 #### 1.4.0
 * Add `autoprefixerOptions` as both instance and global option (provides custom configuration of interal prefixing via `autoprefixer`) - thanks @oasisvali
 
