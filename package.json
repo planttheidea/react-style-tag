@@ -4,8 +4,15 @@
     "babel": "inherit",
     "concurrency": 5,
     "failFast": true,
-    "files": ["test/*.js", "!test/helpers/*.js"],
-    "require": ["babel-register", "babel-polyfill", "./test/helpers/setup-browser-env.js"],
+    "files": [
+      "test/*.js",
+      "!test/helpers/*.js"
+    ],
+    "require": [
+      "babel-register",
+      "babel-polyfill",
+      "./test/helpers/setup-browser-env.js"
+    ],
     "verbose": true
   },
   "bugs": {
@@ -52,7 +59,13 @@
     "webpack-dev-server": "^2.9.4"
   },
   "homepage": "https://github.com/planttheidea/react-style-tag#readme",
-  "keywords": ["react", "style", "css", "css-modules", "postcss"],
+  "keywords": [
+    "react",
+    "style",
+    "css",
+    "css-modules",
+    "postcss"
+  ],
   "license": "MIT",
   "main": "lib/index.js",
   "name": "react-style-tag",
@@ -76,5 +89,5 @@
     "test:update": "NODE_PATH=. NODE_ENV=test ava --update-snapshots",
     "transpile": "babel src --out-dir lib"
   },
-  "version": "1.4.0"
+  "version": "1.4.1"
 }
