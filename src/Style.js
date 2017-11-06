@@ -1,32 +1,17 @@
 // external dependencies
 import isNull from 'lodash/isNull';
-import React, {
-  Component
-} from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
 // local utils
-import {
-  createIdForTag,
-  removeIdFromCache,
-  setCacheId
-} from './cache';
-import {
-  DEFAULT_REACT_STYLE_TAG_GLOBAL_PROPERTIES,
-  NO_BLOB_SUPPORT_ERROR
-} from './constants';
-import {
-  getCoalescedPropsValue,
-  getTransformedCss
-} from './transform';
-import {
-  getHasBlobSupport,
-  getUrl,
-  throwErrorIfIsNotText
-} from './utils';
+import {createIdForTag, removeIdFromCache, setCacheId} from './cache';
+import {DEFAULT_REACT_STYLE_TAG_GLOBAL_PROPERTIES, NO_BLOB_SUPPORT_ERROR} from './constants';
+import {getCoalescedPropsValue, getTransformedCss} from './transform';
+import {getHasBlobSupport, getUrl, throwErrorIfIsNotText} from './utils';
 
 let globalProperties = {...DEFAULT_REACT_STYLE_TAG_GLOBAL_PROPERTIES},
-    hasBlobSupport, url;
+    hasBlobSupport,
+    url;
 
 export const createComponentWillMount = (instance) => {
   /**
@@ -36,10 +21,7 @@ export const createComponentWillMount = (instance) => {
    * just prior to mount, assign blob support if falsy and assign the instance id
    */
   return () => {
-    const {
-      children,
-      id
-    } = instance.props;
+    const {children, id} = instance.props;
 
     if (!hasBlobSupport) {
       url = getUrl();
@@ -76,9 +58,7 @@ export const createShouldComponentUpdate = (instance) => {
    * @returns {boolean} should the component update
    */
   return ({children: nextChildren}) => {
-    const {
-      children
-    } = instance.props;
+    const {children} = instance.props;
 
     return children !== nextChildren;
   };
@@ -92,9 +72,7 @@ export const createComponentDidUpdate = (instance) => {
    * on component update, set the new children in the cache and set the new correct tag
    */
   return () => {
-    const {
-      children
-    } = instance.props;
+    const {children} = instance.props;
 
     setCacheId(instance.id, children);
 
@@ -161,14 +139,10 @@ export const createSetCorrectTag = (instance) => {
    * based on whether sourcemaps are requested, set either a link or style tag
    */
   return () => {
-    const {
-      hasSourceMap
-    } = instance.props;
+    const {hasSourceMap} = instance.props;
 
     if (!isNull(instance.id)) {
-      const {
-        hasSourceMap: hasSourceMapGlobal
-      } = globalProperties;
+      const {hasSourceMap: hasSourceMapGlobal} = globalProperties;
 
       const hasSourceMapFinal = getCoalescedPropsValue(hasSourceMap, hasSourceMapGlobal);
 
@@ -189,12 +163,7 @@ export const createSetLinkTag = (instance) => {
    * set the link tag with the prefixed / minified css text as a blob and move to the document head
    */
   return () => {
-    const {
-      children,
-      doNotPrefix,
-      isMinified,
-      autoprefixerOptions
-    } = instance.props;
+    const {children, doNotPrefix, isMinified, autoprefixerOptions} = instance.props;
 
     throwErrorIfIsNotText(children);
 
@@ -234,12 +203,7 @@ export const createSetStyleTag = (instance) => {
    * set the style tag with the prefixed / minified css text and move to the document head
    */
   return () => {
-    const {
-      children,
-      doNotPrefix,
-      isMinified,
-      autoprefixerOptions
-    } = instance.props;
+    const {children, doNotPrefix, isMinified, autoprefixerOptions} = instance.props;
 
     const {
       doNotPrefix: doNotPrefixGlobal,
@@ -255,11 +219,16 @@ export const createSetStyleTag = (instance) => {
     const isMinifiedFinal = getCoalescedPropsValue(isMinified, isMinifiedGlobal);
     const autoprefixerOptionsFinal = getCoalescedPropsValue(autoprefixerOptions, autoprefixerOptionsGlobal);
 
-    const style = instance.style;
+    if (instance.style) {
+      instance.style.textContent = getTransformedCss(
+        children,
+        doNotPrefixFinal,
+        isMinifiedFinal,
+        autoprefixerOptionsFinal
+      );
 
-    style.textContent = getTransformedCss(children, doNotPrefixFinal, isMinifiedFinal, autoprefixerOptionsFinal);
-
-    document.head.appendChild(style);
+      document.head.appendChild(instance.style);
+    }
   };
 };
 
@@ -301,10 +270,7 @@ class Style extends Component {
       add: PropTypes.bool,
       remove: PropTypes.bool,
       supports: PropTypes.bool,
-      flexbox: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.bool
-      ]),
+      flexbox: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
       grid: PropTypes.bool,
       stats: PropTypes.object
     })
@@ -349,20 +315,20 @@ class Style extends Component {
       ...otherProps
     } = this.props;
 
-    const {
-      hasSourceMap: hasSourceMapGlobal
-    } = globalProperties;
+    const {hasSourceMap: hasSourceMapGlobal} = globalProperties;
 
     const hasSourceMapFinal = getCoalescedPropsValue(hasSourceMap, hasSourceMapGlobal);
 
     if (hasSourceMapFinal && hasBlobSupport) {
       return (
+        /* eslint-disable prettier */
         <link
           id={this.id}
           ref={this.setLinkRef}
           rel="stylesheet"
           {...otherProps}
         />
+        /* eslint-enable */
       );
     }
 

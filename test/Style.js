@@ -3,9 +3,7 @@ import test from 'ava';
 import _ from 'lodash';
 import React from 'react';
 import sinon from 'sinon';
-import {
-  shallow
-} from 'enzyme';
+import {shallow} from 'enzyme';
 import toJson from 'enzyme-to-json';
 
 // src
@@ -76,37 +74,40 @@ test('if createComponentDidUpdate calls setCacheId and setCorrectTag', (t) => {
   stub.restore();
 });
 
-test.serial('if createComponentWillMount will only call getUrl and createIdForTag if blob support is not present', (t) => {
-  const instance = {
-    id: null,
-    props: {
-      children: 'bar',
-      id: 'foo'
-    }
-  };
+test.serial(
+  'if createComponentWillMount will only call getUrl and createIdForTag if blob support is not present',
+  (t) => {
+    const instance = {
+      id: null,
+      props: {
+        children: 'bar',
+        id: 'foo'
+      }
+    };
 
-  const componentWillMount = component.createComponentWillMount(instance);
+    const componentWillMount = component.createComponentWillMount(instance);
 
-  t.true(_.isFunction(componentWillMount));
+    t.true(_.isFunction(componentWillMount));
 
-  const urlStub = sinon.stub(utils, 'getUrl');
-  const blobSupportStub = sinon.stub(utils, 'getHasBlobSupport');
+    const urlStub = sinon.stub(utils, 'getUrl');
+    const blobSupportStub = sinon.stub(utils, 'getHasBlobSupport');
 
-  const createIdStub = sinon.stub(cache, 'createIdForTag').returns(instance.props.id);
+    const createIdStub = sinon.stub(cache, 'createIdForTag').returns(instance.props.id);
 
-  componentWillMount();
+    componentWillMount();
 
-  t.true(urlStub.calledOnce);
+    t.true(urlStub.calledOnce);
 
-  t.true(blobSupportStub.notCalled);
+    t.true(blobSupportStub.notCalled);
 
-  t.true(createIdStub.calledOnce);
-  t.true(createIdStub.calledWith(instance.props.id, instance.props.children));
+    t.true(createIdStub.calledOnce);
+    t.true(createIdStub.calledWith(instance.props.id, instance.props.children));
 
-  urlStub.restore();
-  blobSupportStub.restore();
-  createIdStub.restore();
-});
+    urlStub.restore();
+    blobSupportStub.restore();
+    createIdStub.restore();
+  }
+);
 
 test.serial('if createComponentWillMount will call get getHasBlobSupport if url exists', (t) => {
   const instance = {
@@ -189,27 +190,30 @@ test('if createComponentWillUnmount will mpt call removeIdFromCache if id is nul
   removeIdStub.restore();
 });
 
-test.serial('if createRemoveTagFromHead will create a method that that gets the tag from the instance and removes it from the head', (t) => {
-  const tagType = 'foo';
-  const tag = {};
-  const instance = {
-    [tagType]: tag
-  };
+test.serial(
+  'if createRemoveTagFromHead will create a method that that gets the tag from the instance and removes it from the head',
+  (t) => {
+    const tagType = 'foo';
+    const tag = {};
+    const instance = {
+      [tagType]: tag
+    };
 
-  const removeTagFromHead = component.createRemoveTagFromHead(instance);
+    const removeTagFromHead = component.createRemoveTagFromHead(instance);
 
-  t.true(_.isFunction(removeTagFromHead));
+    t.true(_.isFunction(removeTagFromHead));
 
-  const removeChildStub = sinon.stub(document.head, 'removeChild');
+    const removeChildStub = sinon.stub(document.head, 'removeChild');
 
-  removeTagFromHead(tagType);
+    removeTagFromHead(tagType);
 
-  t.true(removeChildStub.calledOnce);
-  t.true(removeChildStub.calledWith(tag));
-  t.is(instance[tagType], null);
+    t.true(removeChildStub.calledOnce);
+    t.true(removeChildStub.calledWith(tag));
+    t.is(instance[tagType], null);
 
-  removeChildStub.restore();
-});
+    removeChildStub.restore();
+  }
+);
 
 test('if createSetCorrectTag will call the right tag function based on hasSourceMap being false', (t) => {
   const instance = {
@@ -455,20 +459,24 @@ test('if setGlobalOptions will set the global properties based on the options pa
   });
 });
 
-test('if Style will render correctly when using a style tag', (t) => {
+test.skip('if Style will render correctly when using a style tag', (t) => {
   const Style = component.default;
   const id = 'foo';
 
   const wrapper = shallow(
-    <Style
-      id={id}
-    />
+    <Style id={id}>
+      {`
+      .foo {
+        display: block;
+      }
+    `}
+    </Style>
   );
 
   t.snapshot(toJson(wrapper));
 });
 
-test('if Style will render correctly when using a link tag', (t) => {
+test.skip('if Style will render correctly when using a link tag', (t) => {
   const Style = component.default;
   const id = 'foo';
 
@@ -476,13 +484,17 @@ test('if Style will render correctly when using a link tag', (t) => {
     <Style
       hasSourceMap
       id={id}
-    />
+    >{`
+    .foo {
+      display: block;
+    }
+  `}</Style>
   );
 
   t.snapshot(toJson(wrapper));
 });
 
-test('if Style will render correctly when id is null', (t) => {
+test.skip('if Style will render correctly when id is null', (t) => {
   const Style = component.default;
   const id = null;
 
@@ -490,7 +502,13 @@ test('if Style will render correctly when id is null', (t) => {
     <Style
       hasSourceMap
       id={id}
-    />
+    >
+      {`
+    .foo {
+      display: block;
+    }
+  `}{' '}
+    </Style>
   );
 
   t.is(wrapper.type(), null);

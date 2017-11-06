@@ -1,27 +1,14 @@
 import 'babel-polyfill';
 
-import React, {
-  Component,
-  PropTypes
-} from 'react';
-import {
-  render
-} from 'react-dom';
+import PropTypes from 'prop-types';
+import React, {Component} from 'react';
+import {render} from 'react-dom';
 
-import Style, {
-  hashKeys
-} from '../src';
+import Style, {hashKeys} from '../src';
 
-const keys = [
-  'test',
-  'foo',
-  'bar'
-];
+const keys = ['test', 'foo', 'bar'];
 
-const {
-  foo,
-  test
-} = hashKeys(keys);
+const {foo, test} = hashKeys(keys);
 
 /**
  * get a random color for the text
@@ -43,9 +30,7 @@ Style.setGlobalOptions({
 const RegularDiv = ({color}) => {
   return (
     <div>
-      <div className={foo}>
-        I do not toggle
-      </div>
+      <div className={foo}>I do not toggle</div>
 
       <Style>{`
         .${foo} {
@@ -64,13 +49,13 @@ RegularDiv.propTypes = {
 const CustomAutoprefixerDiv = ({color}) => {
   return (
     <div>
-      <div className={foo}>
-        I have no flexbox prefixes
-      </div>
+      <div className={foo}>I have no flexbox prefixes</div>
 
-      <Style autoprefixerOptions={{
-        flexbox: false
-      }}>{`
+      <Style
+        autoprefixerOptions={{
+          flexbox: false
+        }}
+      >{`
         .${foo} {
           color: ${color};
           display: inline-flex;
@@ -88,9 +73,7 @@ CustomAutoprefixerDiv.propTypes = {
 const ToggledDiv = ({color, id}) => {
   return (
     <div>
-      <div className={test}>
-        I toggle
-      </div>
+      <div className={test}>I toggle</div>
 
       <Style id={id}>{`
         .${test} {
@@ -124,9 +107,7 @@ class App extends Component {
   };
 
   onClickToggle = () => {
-    const {
-      isToggledDivShown
-    } = this.state;
+    const {isToggledDivShown} = this.state;
 
     this.setState({
       isToggledDivShown: !isToggledDivShown
@@ -134,12 +115,8 @@ class App extends Component {
   };
 
   render() {
-    const {
-      color
-    } = this.props;
-    const {
-      isToggledDivShown
-    } = this.state;
+    const {color} = this.props;
+    const {isToggledDivShown} = this.state;
 
     return (
       <div>
@@ -150,31 +127,27 @@ class App extends Component {
           Toggle div
         </button>
 
-        <br/>
+        <br />
 
-        <RegularDiv color={color}/>
+        <RegularDiv color={color} />
 
-        <br/>
+        <br />
 
-        <CustomAutoprefixerDiv color={color}/>
+        <CustomAutoprefixerDiv color={color} />
 
-        <br/>
+        <br />
 
-        {isToggledDivShown && (
-          <ToggledDiv
-            color={color}
-            id="toggle-one"
-          />
-        )}
+        {isToggledDivShown && <ToggledDiv
+          color={color}
+          id="toggle-one"
+                              />}
 
-        <br/>
+        <br />
 
-        {isToggledDivShown && (
-          <ToggledDiv
-            color={color}
-            id="toggle-two"
-          />
-        )}
+        {isToggledDivShown && <ToggledDiv
+          color={color}
+          id="toggle-two"
+                              />}
       </div>
     );
   }
@@ -185,13 +158,9 @@ const div = document.createElement('div');
 div.id = 'app-container';
 
 setInterval(() => {
-  render((
-    <App color={getRandomColor()}/>
-  ), div);
+  render(<App color={getRandomColor()} />, div);
 }, 2500);
 
-render((
-  <App color={getRandomColor()}/>
-), div);
+render(<App color={getRandomColor()} />, div);
 
 document.body.appendChild(div);

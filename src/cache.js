@@ -18,9 +18,7 @@ let cache = {};
  */
 export const createGetCacheValuesFromKeys = (localCache = cache) => {
   return reduce((values, key) => {
-    return !localCache[key] ? values : values.concat([
-      localCache[key]
-    ]);
+    return !localCache[key] ? values : values.concat([localCache[key]]);
   }, []);
 };
 
