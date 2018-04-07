@@ -1,344 +1,229 @@
 // external dependencies
-import isNull from 'lodash/isNull';
-import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import React, {Component} from 'react';
+import {createElementRef, createMethod} from 'react-parm';
 
-// local utils
-import {createIdForTag, removeIdFromCache, setCacheId} from './cache';
-import {DEFAULT_REACT_STYLE_TAG_GLOBAL_PROPERTIES, NO_BLOB_SUPPORT_ERROR} from './constants';
-import {getCoalescedPropsValue, getTransformedCss} from './transform';
-import {getHasBlobSupport, getUrl, throwErrorIfIsNotText} from './utils';
+// blob
+import {createGetCachedLinkHref, hasBlobSupport} from './blob';
 
-let globalProperties = {...DEFAULT_REACT_STYLE_TAG_GLOBAL_PROPERTIES},
-    hasBlobSupport,
-    url;
+// constants
+import {SUPPORTS_BEFORE_UPDATE_SNAPSHOT} from './constants';
 
-export const createComponentWillMount = (instance) => {
-  /**
-   * @function componentWillMount
-   *
-   * @description
-   * just prior to mount, assign blob support if falsy and assign the instance id
-   */
-  return () => {
-    const {children, id} = instance.props;
+// options
+import {getCoalescedOption, setGlobalOptions} from './options';
 
-    if (!hasBlobSupport) {
-      url = getUrl();
+// styles
+import {getRenderedStyles} from './styles';
 
-      if (url) {
-        hasBlobSupport = getHasBlobSupport();
-      }
-    }
+/**
+ * @function componentDidMount
+ *
+ * @description
+ * on mount, relocate the node
+ *
+ * @param {ReactComponent} instance the component instance
+ * @param {HTMLElement} instance.node the node to render the styles into
+ * @param {function} instance.relocateNote the method to relocate the node to the head
+ * @returns {void}
+ */
+export const componentDidMount = ({node, relocateNode}) => relocateNode(node);
 
-    instance.id = createIdForTag(id, children);
-  };
-};
+/**
+ * @function getSnapshotBeforeUpdate
+ *
+ * @description
+ * before the update occurs, if the sourceMap requirements have changed, return the node to its original position
+ *
+ * @param {ReactComponent} instance the component instance
+ * @param {HTMLElement} instance.node the node to render the styles into
+ * @param {Object} instance.props the new props of the component
+ * @param {function} instance.returnNode the method to return the node to its original parent
+ * @param {Array<any>} args the arguments passed to the function
+ * @param {Object} previousProps the previous props of the component
+ * @returns {null}
+ */
+export const getSnapshotBeforeUpdate = ({node, props, returnNode}, [previousProps]) => {
+  if (props.hasSourceMap !== previousProps.hasSourceMap) {
+    returnNode(node);
+  }
 
-export const createComponentDidMount = (instance) => {
-  /**
-   * @function componentWillMount
-   *
-   * @description
-   * on mount, set the correct tag based on local or global properties
-   */
-  return () => {
-    instance.setCorrectTag();
-  };
-};
-
-export const createShouldComponentUpdate = (instance) => {
-  /**
-   * @function shouldComponentUpdate
-   *
-   * @description
-   * prevent update of the component unless the children content has changed
-   *
-   * @param {string} nextChildren the incoming children
-   * @returns {boolean} should the component update
-   */
-  return ({children: nextChildren}) => {
-    const {children} = instance.props;
-
-    return children !== nextChildren;
-  };
-};
-
-export const createComponentDidUpdate = (instance) => {
-  /**
-   * @function componentDidUpdate
-   *
-   * @description
-   * on component update, set the new children in the cache and set the new correct tag
-   */
-  return () => {
-    const {children} = instance.props;
-
-    setCacheId(instance.id, children);
-
-    instance.setCorrectTag();
-  };
-};
-
-export const createComponentWillUnmount = (instance) => {
-  /**
-   * @function componentWillUnmount
-   *
-   * @description
-   * just prior to mount, remove all appropriate tags from the head and ids from cache
-   */
-  return () => {
-    instance.removeTagFromHead('link');
-    instance.removeTagFromHead('style');
-
-    if (!isNull(instance.id)) {
-      removeIdFromCache(instance.id);
-    }
-  };
-};
-
-export const createAssignRefToInstance = (instance, refName) => {
-  /**
-   * @function assignRefToInstance
-   *
-   * @description
-   * assign the element passed to the instance at refName
-   *
-   * @param {HTMLElement} element the element to assign to the instance
-   */
-  return (element) => {
-    instance[refName] = element;
-  };
-};
-
-export const createRemoveTagFromHead = (instance) => {
-  /**
-   * @function removeTagFromHead
-   *
-   * @description
-   * remove the tagType from the document head if it exists
-   *
-   * @param {string} tagType
-   */
-  return (tagType) => {
-    const tag = instance[tagType];
-
-    if (tag) {
-      document.head.removeChild(tag);
-
-      instance[tagType] = null;
-    }
-  };
-};
-
-export const createSetCorrectTag = (instance) => {
-  /**
-   * @function setCorrectTag
-   *
-   * @description
-   * based on whether sourcemaps are requested, set either a link or style tag
-   */
-  return () => {
-    const {hasSourceMap} = instance.props;
-
-    if (!isNull(instance.id)) {
-      const {hasSourceMap: hasSourceMapGlobal} = globalProperties;
-
-      const hasSourceMapFinal = getCoalescedPropsValue(hasSourceMap, hasSourceMapGlobal);
-
-      if (hasSourceMapFinal) {
-        instance.setLinkTag();
-      } else {
-        instance.setStyleTag();
-      }
-    }
-  };
-};
-
-export const createSetLinkTag = (instance) => {
-  /**
-   * @function setLinkTag
-   *
-   * @description
-   * set the link tag with the prefixed / minified css text as a blob and move to the document head
-   */
-  return () => {
-    const {children, doNotPrefix, isMinified, autoprefixerOptions} = instance.props;
-
-    throwErrorIfIsNotText(children);
-
-    instance.removeTagFromHead('style');
-
-    if (!hasBlobSupport) {
-      throw new ReferenceError(NO_BLOB_SUPPORT_ERROR);
-    }
-
-    const {
-      doNotPrefix: doNotPrefixGlobal,
-      isMinified: isMinifiedGlobal,
-      autoprefixerOptions: autoprefixerOptionsGlobal
-    } = globalProperties;
-
-    const doNotPrefixFinal = getCoalescedPropsValue(doNotPrefix, doNotPrefixGlobal);
-    const isMinifiedFinal = getCoalescedPropsValue(isMinified, isMinifiedGlobal);
-    const autoprefixerOptionsFinal = getCoalescedPropsValue(autoprefixerOptions, autoprefixerOptionsGlobal);
-    const transformedCss = getTransformedCss(children, doNotPrefixFinal, isMinifiedFinal, autoprefixerOptionsFinal);
-
-    const link = instance.link;
-    const blob = new window.Blob([transformedCss], {
-      type: 'text/css'
-    });
-
-    link.href = url.createObjectURL(blob);
-
-    document.head.appendChild(link);
-  };
-};
-
-export const createSetStyleTag = (instance) => {
-  /**
-   * @function setStyleTag
-   *
-   * @description
-   * set the style tag with the prefixed / minified css text and move to the document head
-   */
-  return () => {
-    const {children, doNotPrefix, isMinified, autoprefixerOptions} = instance.props;
-
-    const {
-      doNotPrefix: doNotPrefixGlobal,
-      isMinified: isMinifiedGlobal,
-      autoprefixerOptions: autoprefixerOptionsGlobal
-    } = globalProperties;
-
-    throwErrorIfIsNotText(children);
-
-    instance.removeTagFromHead('link');
-
-    const doNotPrefixFinal = getCoalescedPropsValue(doNotPrefix, doNotPrefixGlobal);
-    const isMinifiedFinal = getCoalescedPropsValue(isMinified, isMinifiedGlobal);
-    const autoprefixerOptionsFinal = getCoalescedPropsValue(autoprefixerOptions, autoprefixerOptionsGlobal);
-
-    if (instance.style) {
-      instance.style.textContent = getTransformedCss(
-        children,
-        doNotPrefixFinal,
-        isMinifiedFinal,
-        autoprefixerOptionsFinal
-      );
-
-      document.head.appendChild(instance.style);
-    }
-  };
+  return null;
 };
 
 /**
- * @function setGlobalOptions
+ * @function componentDidUpdate
  *
  * @description
- * set the global options for all instances of Style
+ * on update, if the sourceMap requirements have changed then relocate the new node to the head,
+ * and if the styles have changed then set them in staet
  *
- * @param {object} options
- * @param {boolean} [options.doNotPrefix]
- * @param {boolean} [options.hasSourceMap]
- * @param {boolean} [options.isMinified]
- * @param {object} [options.autoprefixerOptions]
- * @returns {Object} globalProperties
+ * @param {ReactComponent} instance the component instance
+ * @param {function} instance.getStyleForState the method to get the new rendered style
+ * @param {HTMLElement} instance.node the node to render the styles into
+ * @param {function} instance.relocateNote the method to relocate the node to the head
+ * @param {Object} instance.props the new props of the component
+ * @param {function} instance.setState the method to set the state of the component
+ * @param {Array<any>} args the arguments passed to the function
+ * @param {Object} previousProps the previous props of the component
  */
-export const setGlobalOptions = (options) => {
-  Object.keys(options).forEach((option) => {
-    if (globalProperties.hasOwnProperty(option)) {
-      globalProperties[option] = options[option];
-    }
-  });
+export const componentDidUpdate = ({getStyleForState, node, relocateNode, props, setState}, [previousProps]) => {
+  if (props.hasSourceMap !== previousProps.hasSourceMap) {
+    relocateNode(node);
+  }
 
-  return globalProperties;
+  if (props.children !== previousProps.children) {
+    setState(getStyleForState);
+  }
+};
+
+/**
+ * @function componentWillUnmount
+ *
+ * @description
+ * prior to unmount, return the node to its original parent
+ *
+ * @param {ReactComponent} instance the component instance
+ * @param {HTMLElement} instance.node the node to render the styles into
+ * @param {function} instance.returnNode the method to return the node to its original parent
+ * @returns {void}
+ */
+export const componentWillUnmount = ({node, returnNode}) => returnNode(node);
+
+/**
+ * @function getStyleForState
+ *
+ * @description
+ * get the styles to be used for the rendered tag
+ *
+ * @param {ReactComponent} instance the component instance
+ * @param {Object} instance.props the new props of the component
+ * @returns {{style: string}} the style strng to use in the rendered tag
+ */
+export const getStyleForState = ({props}) => ({
+  style: getRenderedStyles(props.children, {
+    isCompressed: getCoalescedOption(props, 'isCompressed'),
+    isMinified: getCoalescedOption(props, 'isMinified'),
+    isPrefixed: getCoalescedOption(props, 'isPrefixed')
+  })
+});
+
+/**
+ * @function relocateNode
+ *
+ * @description
+ * relocate the node to the bottom of the head
+ *
+ * @param {ReactComponent} instance the component instance
+ * @param {Array<any>} args the arguments passed to the function
+ * @param {HTMLElement} node the node to render the styles into
+ */
+export const relocateNode = (instance, [node]) => {
+  if (typeof document !== 'undefined' && node) {
+    instance.originalParent = node.parentNode;
+
+    instance.originalParent.removeChild(node);
+    document.head.appendChild(node);
+  }
+};
+
+/**
+ * @function returnNode
+ *
+ * @description
+ * return the node to the original parent
+ *
+ * @param {ReactComponent} instance the component instance
+ * @param {Array<any>} args the arguments passed to the function
+ * @param {HTMLElement} node the node to render the styles into
+ */
+export const returnNode = (instance, [node]) => {
+  if (typeof document !== 'undefined' && node) {
+    try {
+      document.head.removeChild(node);
+      instance.originalParent.appendChild(node);
+    } catch (error) {
+      // ignore the error
+    }
+  }
 };
 
 class Style extends Component {
   static propTypes = {
-    children: PropTypes.node,
-    doNotPrefix: PropTypes.bool,
+    children: PropTypes.string.isRequired,
     hasSourceMap: PropTypes.bool,
-    id: PropTypes.string,
+    isCompressed: PropTypes.bool,
     isMinified: PropTypes.bool,
-    autoprefixerOptions: PropTypes.shape({
-      // shape defined by autoprefixer options documentation at https://www.npmjs.com/package/autoprefixer
-      browsers: PropTypes.arrayOf(PropTypes.string),
-      env: PropTypes.string,
-      cascade: PropTypes.bool,
-      add: PropTypes.bool,
-      remove: PropTypes.bool,
-      supports: PropTypes.bool,
-      flexbox: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
-      grid: PropTypes.bool,
-      stats: PropTypes.object
-    })
+    isPrefixed: PropTypes.bool
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = getStyleForState({props});
+  }
+
   // lifecycle methods
-  componentWillMount = createComponentWillMount(this);
-  componentDidMount = createComponentDidMount(this);
-  shouldComponentUpdate = createShouldComponentUpdate(this);
-  componentDidUpdate = createComponentDidUpdate(this);
-  componentWillUnmount = createComponentWillUnmount(this);
+  componentDidMount = createMethod(this, componentDidMount);
+  componentDidUpdate = createMethod(this, componentDidUpdate);
+  /* eslint-disable react/sort-comp */
+  [SUPPORTS_BEFORE_UPDATE_SNAPSHOT ? 'getSnapshotBeforeUpdate' : 'componentWillUpdate'] = createMethod(
+    this,
+    getSnapshotBeforeUpdate
+  );
+  /* eslint-enable */
+  componentWillUnmount = createMethod(this, componentWillUnmount);
 
   // instance values
-  hasBlobSupport = false;
-  id = null;
-  link = null;
-  style = null;
+  linkHref = null;
+  node = null;
+  originalParent = null;
 
   // static methods
-  static setGlobalOptions = setGlobalOptions;
+  setGlobalOptions = setGlobalOptions;
 
   // instance methods
-  removeTagFromHead = createRemoveTagFromHead(this);
-  setCorrectTag = createSetCorrectTag(this);
-  setLinkRef = createAssignRefToInstance(this, 'link');
-  setLinkTag = createSetLinkTag(this);
-  setStyleRef = createAssignRefToInstance(this, 'style');
-  setStyleTag = createSetStyleTag(this);
+  getCachedLinkHref = createGetCachedLinkHref();
+  getStyleForState = createMethod(this, getStyleForState);
+  relocateNode = createMethod(this, relocateNode);
+  returnNode = createMethod(this, returnNode);
 
   render() {
-    if (isNull(this.id)) {
-      return null;
-    }
-
     const {
-      children,
-      doNotPrefix: doNotPrefixIgnored,
-      hasSourceMap,
-      id: idIgnored,
-      isMinified: isMinifiedIgnored,
-      autoprefixerOptions: autoprefixerOptionsIgnored,
-      ...otherProps
+      children: childrenIgnored,
+      hasSourceMap: hasSourceMapIgnored,
+      isCompressed: isMinifiedIgnored,
+      isPrefixed: isPrefixedIgnored,
+      ...props
     } = this.props;
+    const {style} = this.state;
 
-    const {hasSourceMap: hasSourceMapGlobal} = globalProperties;
+    if (getCoalescedOption(this.props, 'hasSourceMap')) {
+      if (hasBlobSupport()) {
+        return (
+          /* eslint-disable prettier */
+          <link
+            href={this.getCachedLinkHref(style)}
+            ref={createElementRef(this, 'node')}
+            rel="stylesheet"
+            {...props}
+          />
+          /* eslint-enable */
+        );
+      }
 
-    const hasSourceMapFinal = getCoalescedPropsValue(hasSourceMap, hasSourceMapGlobal);
-
-    if (hasSourceMapFinal && hasBlobSupport) {
-      return (
-        /* eslint-disable prettier */
-        <link
-          id={this.id}
-          ref={this.setLinkRef}
-          rel="stylesheet"
-          {...otherProps}
-        />
-        /* eslint-enable */
+      /* eslint-disable no-console */
+      console.error(
+        'To support sourcemaps for react-style-tag you need Blob support, and the browser you are using does not currently support it. You should include a polyfill prior to the rendering of this component.'
       );
+      /* eslint-enable */
     }
 
     return (
       <style
-        id={this.id}
-        ref={this.setStyleRef}
-        {...otherProps}
+        ref={createElementRef(this, 'node')}
+        {...props}
       >
-        {children}
+        {style}
       </style>
     );
   }

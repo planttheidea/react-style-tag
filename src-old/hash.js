@@ -1,3 +1,6 @@
+// external dependencies
+import reduce from 'lodash/fp/reduce';
+
 let counter = 0;
 
 /**
@@ -26,14 +29,13 @@ export const hash = (key) => {
  * @function hashKeys
  *
  * @description
- * create a hash map based on the keys passed
+ * return map with hashed keys associated to their original values
  *
- * @param {Array<string>} keys the keys to hash
- * @returns {Object} the hashmap of key => has pairs
+ * @param {array<string>} keys
+ * @returns {object}
  */
-export const hashKeys = (keys) =>
-  keys.reduce((hashMap, key) => {
-    hashMap[key] = hash(key);
+export const hashKeys = reduce((hashMap, key) => {
+  hashMap[key] = hash(key);
 
-    return hashMap;
-  }, {});
+  return hashMap;
+}, {});
