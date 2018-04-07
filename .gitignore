@@ -2,5 +2,7 @@
 .nyc_output
 coverage
 node_modules
+dist
+es
 lib
-npm-debug.log
+*.log
