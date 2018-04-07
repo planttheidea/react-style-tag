@@ -7,9 +7,18 @@
  * @returns {Object} the URL object to generate blobs with
  */
 export const getUrl = (() => {
-  let URL = null;
+  const defaultObject = {};
 
-  return () => URL || (URL = typeof window !== 'undefined' ? window.URL || window.webkitURL : {});
+  let URL = defaultObject;
+
+  const getUrl = () =>
+    URL !== defaultObject
+      ? URL
+      : (URL = typeof window !== 'undefined' ? window.URL || window.webkitURL : defaultObject);
+
+  getUrl.reset = () => (URL = defaultObject);
+
+  return getUrl;
 })();
 
 /**
@@ -45,7 +54,11 @@ export const getHasBlobSupport = () =>
 export const hasBlobSupport = (() => {
   let support = false;
 
-  return () => support || (support = getHasBlobSupport());
+  const hasBlobSupport = () => support || (support = getHasBlobSupport());
+
+  hasBlobSupport.reset = () => (support = false);
+
+  return hasBlobSupport;
 })();
 
 /**
@@ -73,5 +86,6 @@ export const createGetCachedLinkHref = () =>
     let href = null,
         currentStyle = null;
 
-    return (style) => (style === currentStyle ? href : (href = getLinkHref(style)));
+    return (style) =>
+      style === currentStyle ? href : (currentStyle = style) ? (href = getLinkHref(style)) : (href = null);
   })();

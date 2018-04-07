@@ -27,11 +27,7 @@ test('if hash will return a consistent string', (t) => {
 });
 
 test('if hashKeys will create a hashMap based on the keys passed', (t) => {
-  const keys = [
-    'foo',
-    'bar',
-    'baz'
-  ];
+  const keys = ['foo', 'bar', 'baz'];
   const hashes = keys.map(hash.hash);
 
   const result = hash.hashKeys(keys);

@@ -35,5 +35,8 @@ export const getCoalescedOption = (props, option) =>
  */
 export const setGlobalOptions = (options) =>
   Object.keys(options).forEach(
-    (option) => GLOBAL_OPTIONS.hasOwnProperty(option) && (GLOBAL_OPTIONS[option] = options[option])
+    (option) =>
+      GLOBAL_OPTIONS.hasOwnProperty(option) &&
+      typeof options[option] === 'boolean' &&
+      (GLOBAL_OPTIONS[option] = options[option])
   );

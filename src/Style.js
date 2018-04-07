@@ -179,7 +179,7 @@ class Style extends Component {
   originalParent = null;
 
   // static methods
-  setGlobalOptions = setGlobalOptions;
+  static setGlobalOptions = setGlobalOptions;
 
   // instance methods
   getCachedLinkHref = createGetCachedLinkHref();
