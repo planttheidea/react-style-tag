@@ -30,7 +30,10 @@ export default [
       babel({
         exclude: 'node_modules/**'
       })
-    ]
+    ],
+    treeshake: {
+      pureExternalModules: true
+    }
   },
   {
     external: ['prop-types', 'react', 'react-dom'],
@@ -58,6 +61,9 @@ export default [
         exclude: 'node_modules/**'
       }),
       uglify()
-    ]
+    ],
+    treeshake: {
+      pureExternalModules: true
+    }
   }
 ];
