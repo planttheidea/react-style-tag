@@ -12,16 +12,9 @@
     "url": "https://github.com/planttheidea/react-style-tag/issues"
   },
   "dependencies": {
-    "autoprefixer": "^8.2.0",
-    "blob-polyfill": "^2.0.20171115",
     "cssbeautify": "^0.3.1",
-    "hash-it": "^3.1.2",
-    "lodash": "^4.17.5",
-    "postcss": "^6.0.21",
-    "prop-types": "^15.6.1",
     "react-parm": "^1.0.0",
-    "stylis": "^3.5.0",
-    "uuid": "^3.2.1"
+    "stylis": "^3.5.0"
   },
   "description": "Write scoped, autoprefixed styles declaratively in React",
   "devDependencies": {
@@ -36,6 +29,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "babel-register": "^6.26.0",
+    "blob-polyfill": "^2.0.20171115",
     "browser-env": "^3.2.5",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
@@ -48,9 +42,10 @@
     "in-publish": "2.0.0",
     "json-loader": "0.5.7",
     "nyc": "^11.6.0",
+    "prop-types": "^15.6.1",
     "react": "^16.3.1",
-    "react-addons-test-utils": "^15.6.2",
     "react-dom": "^16.3.1",
+    "react-test-renderer": "^16.3.1",
     "rollup": "^0.57.1",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-commonjs": "^9.1.0",
@@ -69,6 +64,7 @@
   "module": "es/index.js",
   "name": "react-style-tag",
   "peerDependencies": {
+    "prop-types": "^15.6.1",
     "react": "^15.3.0 || ^16.0.0",
     "react-dom": "^15.3.0 || ^16.0.0"
   },

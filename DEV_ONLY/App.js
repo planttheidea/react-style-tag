@@ -7,7 +7,7 @@ import Style, {hashKeys} from '../src';
 
 const keys = ['test', 'foo', 'bar'];
 
-const {foo, test} = hashKeys(keys);
+const {foo, bar, test} = hashKeys(keys);
 
 /**
  * get a random color for the text
@@ -45,15 +45,13 @@ RegularDiv.propTypes = {
   color: PropTypes.string
 };
 
-const CustomAutoprefixerDiv = ({color}) => (
+const UnprefixedDiv = ({color}) => (
   <div>
-    <div className={foo}>I have no flexbox prefixes</div>
+    <div className={bar}>I have no prefixes</div>
 
-    <Style
-      isPrefixed={false}
-    >
+    <Style isPrefixed={false}>
       {`
-        .${foo} {
+        .${bar} {
           color: ${color};
           display: inline-flex;
           transition: color 250ms ease-in-out;
@@ -63,7 +61,7 @@ const CustomAutoprefixerDiv = ({color}) => (
   </div>
 );
 
-CustomAutoprefixerDiv.propTypes = {
+UnprefixedDiv.propTypes = {
   color: PropTypes.string
 };
 
@@ -122,11 +120,13 @@ class App extends PureComponent {
 
     const color = getRandomColor();
 
-    console.log(hasSourceMap);
-
     return (
       <div>
         <h1>App</h1>
+
+        <div>
+          <button onClick={this.onToggleVisible}>Click to toggle main style</button>
+        </div>
 
         <span className="foo">When hovered, I turn red.</span>
 
@@ -143,23 +143,29 @@ class App extends PureComponent {
 
         <br />
 
-        <CustomAutoprefixerDiv color={color} />
+        <UnprefixedDiv color={color} />
 
         <br />
 
-        {isToggledDivShown && <ToggledDiv
-          color={color}
-          id="toggle-one"
-                              />}
+        {isToggledDivShown && (
+          /* eslint-disable prettier */
+          <ToggledDiv
+            color={color}
+            id="toggle-one"
+          />
+          /* eslint-enable */
+        )}
 
         <br />
 
-        {isToggledDivShown && <ToggledDiv
-          color={color}
-          id="toggle-two"
-                              />}
-
-        <button onClick={this.onToggleVisible}>Click to toggle style</button>
+        {isToggledDivShown && (
+          /* eslint-disable prettier */
+          <ToggledDiv
+            color={color}
+            id="toggle-two"
+          />
+          /* eslint-enable */
+        )}
 
         {isVisible && (
           <Style

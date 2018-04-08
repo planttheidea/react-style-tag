@@ -1,6 +1,6 @@
 // external dependencies
 import PropTypes from 'prop-types';
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import {createElementRef, createMethod} from 'react-parm';
 
 // blob
@@ -36,16 +36,11 @@ export const componentDidMount = ({node, relocateNode}) => relocateNode(node);
  *
  * @param {ReactComponent} instance the component instance
  * @param {HTMLElement} instance.node the node to render the styles into
- * @param {Object} instance.props the new props of the component
  * @param {function} instance.returnNode the method to return the node to its original parent
- * @param {Array<any>} args the arguments passed to the function
- * @param {Object} previousProps the previous props of the component
  * @returns {null}
  */
-export const getSnapshotBeforeUpdate = ({node, props, returnNode}, [previousProps]) => {
-  if (props.hasSourceMap !== previousProps.hasSourceMap) {
-    returnNode(node);
-  }
+export const getSnapshotBeforeUpdate = ({node, returnNode}) => {
+  returnNode(node);
 
   return null;
 };
@@ -67,9 +62,7 @@ export const getSnapshotBeforeUpdate = ({node, props, returnNode}, [previousProp
  * @param {Object} previousProps the previous props of the component
  */
 export const componentDidUpdate = ({getStyleForState, node, relocateNode, props, setState}, [previousProps]) => {
-  if (props.hasSourceMap !== previousProps.hasSourceMap) {
-    relocateNode(node);
-  }
+  relocateNode(node);
 
   if (props.children !== previousProps.children) {
     setState(getStyleForState);
@@ -143,14 +136,18 @@ export const returnNode = (instance, [node]) => {
       instance.originalParent.appendChild(node);
     } catch (error) {
       // ignore the error
+    } finally {
+      instance.node = null;
+      instance.originalParent = null;
     }
   }
 };
 
-class Style extends Component {
+class Style extends PureComponent {
   static propTypes = {
     children: PropTypes.string.isRequired,
     hasSourceMap: PropTypes.bool,
+    id: PropTypes.string,
     isCompressed: PropTypes.bool,
     isMinified: PropTypes.bool,
     isPrefixed: PropTypes.bool
@@ -202,10 +199,10 @@ class Style extends Component {
         return (
           /* eslint-disable prettier */
           <link
+            {...props}
             href={this.getCachedLinkHref(style)}
             ref={createElementRef(this, 'node')}
             rel="stylesheet"
-            {...props}
           />
           /* eslint-enable */
         );
