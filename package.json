@@ -4,8 +4,15 @@
     "babel": "inherit",
     "concurrency": 5,
     "failFast": true,
-    "files": ["test/*.js", "!test/helpers/*.js"],
-    "require": ["babel-register", "babel-polyfill", "./test/helpers/setup-browser-env.js"],
+    "files": [
+      "test/*.js",
+      "!test/helpers/*.js"
+    ],
+    "require": [
+      "babel-register",
+      "babel-polyfill",
+      "./test/helpers/setup-browser-env.js"
+    ],
     "verbose": true
   },
   "bugs": {
@@ -58,7 +65,13 @@
     "webpack-dev-server": "^3.1.1"
   },
   "homepage": "https://github.com/planttheidea/react-style-tag#readme",
-  "keywords": ["react", "style", "css", "css-modules", "postcss"],
+  "keywords": [
+    "react",
+    "style",
+    "css",
+    "css-modules",
+    "postcss"
+  ],
   "license": "MIT",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -83,8 +96,7 @@
     "lint": "NODE_ENV=test eslint src",
     "lint:fix": "NODE_ENV=test eslint src --fix",
     "prepublish": "if in-publish; then npm run prepublish:compile; fi",
-    "prepublish:compile":
-      "npm run lint && npm run test:coverage && npm run transpile:lib && npm run transpile:es && npm run dist",
+    "prepublish:compile": "npm run lint && npm run test:coverage && npm run transpile:lib && npm run transpile:es && npm run dist",
     "start": "npm run dev",
     "test": "NODE_PATH=. BABEL_ENV=test ava",
     "test:coverage": "nyc npm test",
@@ -92,5 +104,5 @@
     "transpile:lib": "npm run clean:lib && BABEL_ENV=lib babel src --out-dir lib",
     "transpile:es": "npm run clean:es && BABEL_ENV=es babel src --out-dir es"
   },
-  "version": "1.4.1"
+  "version": "2.0.0"
 }
