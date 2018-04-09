@@ -3,7 +3,7 @@ import 'babel-polyfill';
 import PropTypes from 'prop-types';
 import React, {PureComponent} from 'react';
 
-import Style, {hashKeys} from '../src';
+import {hashKeys, Style} from '../src';
 
 const keys = ['test', 'foo', 'bar'];
 
