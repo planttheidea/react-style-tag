@@ -2,7 +2,7 @@
 
 Write styles declaratively in React
 
-#### Table of contents
+## Table of contents
 
 * [Installation](#installation)
 * [Usage](#usage)
@@ -10,18 +10,21 @@ Write styles declaratively in React
 * [Summary](#summary)
 * [Scoped Styles](#scoped-styles)
 * [Props](#props)
+  * [hasSourceMap](#hassourcemap)
+  * [isCompressed](#iscompressed)
+  * [isMinified](#isminified)
+  * [isPrefixed](#isprefixed)
 * [Global Options](#global-options)
-* [Additional webpack configuration requirements](#additional-webpack-configuration-requirements)
 * [Development](#development)
 * [Todo](#todo)
 
-#### Installation
+## Installation
 
 ```
 $ npm i react-style-tag --save
 ```
 
-#### Usage
+## Usage
 
 ```javascript
 // ES2015
@@ -31,7 +34,7 @@ import { Style } from "react-style-tag";
 const Style = require("react-style-tag").Style;
 ```
 
-#### Implementation
+## Implementation
 
 ```javascript
 import React, { Component } from "react";
@@ -65,13 +68,13 @@ class App extends Component {
 }
 ```
 
-#### Summary
+## Summary
 
 `react-style-tag` creates a React component that will inject a `<style>` tag into the document's head with the styles that you pass as the text content of the tag. Notice above that the styles are wrapped in `` {` ``and`` `} ``, which create a template literal string. Internally, `react-style-tag` parses this text and applies all necessary prefixes via [`stylis`](https://github.com/thysultan/stylis.js). All valid CSS is able to be used (`@media`, `@font-face`, you name it), and you can use nesting via the use of the `&` reference to the parent selector.
 
 The style tag that is injected into the head will be automatically mounted whenever the component it is rendered in is mounted, and will be automatically unmounted whenever the component it is rendered in is unmounted.
 
-#### Scoped Styles
+## Scoped Styles
 
 There is an additional utility provided that can help to scope your styles in the vein of [CSS Modules](https://github.com/css-modules/css-modules), and this is `hashKeys`. This function accepts an array of keys to hash, and returns a map of the keys to their hashed values.
 
@@ -117,15 +120,13 @@ class App extends Component {
 
 Notice you can easily mix both scoped and global styles, and for mental mapping the scoped styles all follow the format `scoped__{key}__{hash}`, for example `scoped__test__3769397038`. The hashes are uniquely based on each execution of `hashKeys`, so the implementation can either be Component-specific (if defined outside the class) or instance-specific (if defined inside the class, on `componentDidMount` for example).
 
-#### Props
+## Props
 
 Naturally you can pass all standard attributes (`id`, `name`, etc.) and they will be passed to the `<style>` tag, but there are a few additional props that are specific to the component.
 
-**isCompressed** _boolean, defaults to true_
+#### hasSourceMap
 
-If set to `false`, it will prevent aggressive compression of the CSS.
-
-**hasSourceMap** _boolean, defaults to false in production, true otherwise_
+_boolean, defaults to false in production, true otherwise_
 
 If set to `true`, it will render a `<link>` tag instead of a `<style>` tag, which allows easy source referencing in browser DevTools. This is similar to the way that webpack handles its `style-loader`.
 
@@ -133,15 +134,25 @@ The use of sourcemaps require the use of `Blob`, which is supported in IE10+, Sa
 
 Make sure this import occurs prior to the import of `react-style-tag` to ensure blob support is present.
 
-**isMinified** _boolean, defaults to true in production, false otherwise_
+#### isCompressed
+
+_boolean, defaults to true_
+
+If set to `false`, it will prevent aggressive compression of the CSS.
+
+#### isMinified
+
+_boolean, defaults to true in production, false otherwise_
 
 If set to `false`, it will pretty-print the rendered CSS text. This can be helpful in development for readability of styles.
 
-**isPrefixed** _boolean, defaults to true_
+#### isPrefixed
+
+_boolean, defaults to true_
 
 If set to `false`, it will prevent `stylis` from applying vendor prefixes to the CSS.
 
-### Global Options
+## Global Options
 
 All of the props available are also available as global options for all instances that can be set with the `setGlobalOptions` method:
 
@@ -169,7 +180,7 @@ Style.setGlobalOptions({
 });
 ```
 
-### Development
+## Development
 
 Standard stuff, clone the repo and `npm i` to get the dependencies. npm scripts available:
 

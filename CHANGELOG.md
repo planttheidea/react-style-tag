@@ -1,5 +1,9 @@
 # react-style-tag CHANGELOG
 
+## 2.0.1
+
+* README fixes
+
 ## 2.0.0
 
 * Rewritten using `stylis` for both footprint and performance
