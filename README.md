@@ -3,6 +3,7 @@
 Write styles declaratively in React
 
 #### Table of contents
+
 * [Installation](#installation)
 * [Usage](#usage)
 * [Implementation](#implementation)
@@ -24,20 +25,18 @@ $ npm i react-style-tag --save
 
 ```javascript
 // ES2015
-import Style from 'react-style-tag';
+import { Style } from "react-style-tag";
 
 // CommonJS
-const Style = require('react-style-tag').default;
+const Style = require("react-style-tag").Style;
 ```
 
 #### Implementation
 
 ```javascript
-import React, {
-  Component
-} from 'react';
+import React, { Component } from "react";
 
-import Style from 'react-style-tag';
+import { Style } from "react-style-tag";
 
 class App extends Component {
   render() [
@@ -50,6 +49,14 @@ class App extends Component {
         <Style>{`
           .foo {
             color: red;
+
+            &:hover {
+              background-color: gray;
+            }
+
+            @media print {
+              color: black;
+            }
           }
         `}</Style>
       </div>
@@ -60,7 +67,7 @@ class App extends Component {
 
 #### Summary
 
-`react-style-tag` creates a React component that will inject a `<style>` tag into the document's head with the styles that you pass as the text content of the tag. Notice above that the styles are wrapped in ``{` ``and`` `}``, which create a template literal string. Internally, `react-style-tag` parses this text and applies all necessary prefixes via [`autoprefixer`](https://github.com/postcss/autoprefixer). All valid CSS is able to be used (`@media`, `@font-face`, you name it).
+`react-style-tag` creates a React component that will inject a `<style>` tag into the document's head with the styles that you pass as the text content of the tag. Notice above that the styles are wrapped in `` {` ``and`` `} ``, which create a template literal string. Internally, `react-style-tag` parses this text and applies all necessary prefixes via [`stylis`](https://github.com/thysultan/stylis.js). All valid CSS is able to be used (`@media`, `@font-face`, you name it), and you can use nesting via the use of the `&` reference to the parent selector.
 
 The style tag that is injected into the head will be automatically mounted whenever the component it is rendered in is mounted, and will be automatically unmounted whenever the component it is rendered in is unmounted.
 
@@ -69,15 +76,9 @@ The style tag that is injected into the head will be automatically mounted whene
 There is an additional utility provided that can help to scope your styles in the vein of [CSS Modules](https://github.com/css-modules/css-modules), and this is `hashKeys`. This function accepts an array of keys to hash, and returns a map of the keys to their hashed values.
 
 ```javascript
-import Style, {
-  hashKeys
-} from 'react-style-tag';
+import { hashKeys, Style } from "react-style-tag";
 
-const classNamesToHash = ['foo', 'bar'];
-const {
-  foo,
-  bar
-} = hashKeys(classNamesToHash);
+const { foo, bar } = hashKeys(["foo", "bar"]);
 
 class App extends Component {
   render() {
@@ -118,120 +119,70 @@ Notice you can easily mix both scoped and global styles, and for mental mapping 
 
 #### Props
 
-Naturally you can pass all standard attributes (`id`, `name`, etc.) and they will be passed to the `<style>` tag, but there are a few  additional props that are specific to the component.
+Naturally you can pass all standard attributes (`id`, `name`, etc.) and they will be passed to the `<style>` tag, but there are a few additional props that are specific to the component.
 
-**doNotPrefix** *boolean, defaults to false*
+**isCompressed** _boolean, defaults to true_
 
-If set to `true`, it will prevent autoprefixer from processing the CSS and just render whatever text you pass it.
+If set to `false`, it will prevent aggressive compression of the CSS.
 
-**hasSourceMap** *boolean, defaults to false*
+**hasSourceMap** _boolean, defaults to false in production, true otherwise_
 
 If set to `true`, it will render a `<link>` tag instead of a `<style>` tag, which allows easy source referencing in browser DevTools. This is similar to the way that webpack handles its `style-loader`.
 
-The use of sourcemaps require the use of `Blob`, which is supported in IE10+, Safari 6.1+, and all other modern browsers (Chrome, Firefox, etc.). If you browser does not support `Blob` and you want to use sourcemaps, there is an included polyfill which you will need to import separately:
+The use of sourcemaps require the use of `Blob`, which is supported in IE10+, Safari 6.1+, and all other modern browsers (Chrome, Firefox, etc.). If you browser does not support `Blob` and you want to use sourcemaps, you should include a polyfill. Recommended is [`blob-polyfill`](https://www.npmjs.com/package/blob-polyfill).
 
-```javascript
-import 'react-script-tag/blob-polyfill';
-```
+Make sure this import occurs prior to the import of `react-style-tag` to ensure blob support is present.
 
-Make sure this import occurs prior to the import of `react-style-tag`. Naturally, this is only necessary if you are not using an alternative polyfill.
+**isMinified** _boolean, defaults to true in production, false otherwise_
 
-**isMinified** *boolean, defaults to false*
+If set to `false`, it will pretty-print the rendered CSS text. This can be helpful in development for readability of styles.
 
-If set to `true`, it will minify the rendered CSS text. A possible implementation for this would be something like:
+**isPrefixed** _boolean, defaults to true_
 
-```javascript
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
-
-<Style isMinified={IS_PRODUCTION}>
-  .test {
-    display: block;
-  }
-</Style>
-```
-
-This would result in:
-
-```javascript
-<style>.test{display:block}</style>
-```
-
-**autoprefixerOptions** *object, defaults to `{ remove: false }`*
-
-This prop can be set to any plain object containing options for the [autoprefixer](https://www.npmjs.com/package/autoprefixer#options).
-
-The autoprefixer instance generation is memoized, so using the same `autoprefixerOptions` prop across multiple `Style` components should be performant as long as the same object instance is used. So, in the case of multiple `Style` tags with the same autoprefixerOptions:
-
-```
-<Style autoprefixerOptions={{ remove: true }}>{cssText}</Style>
-
-// later in the code - this will cause another autoprefixer instance to be created
-<Style autoprefixerOptions={{ remove: true }}>{cssText}</Style>
-```
-
-A better approach would be to define the options once and reuse the options object.
-
-```
-const AUTOPREFIXER_OPTIONS = {remove: true};
-
-<Style autoprefixerOptions={AUTOPREFIXER_OPTIONS}>{cssText}</Style>
-
-// later in the code - this will reuse the same autoprefixer instance
-<Style autoprefixerOptions={AUTOPREFIXER_OPTIONS}>{cssText}</Style>
-```
+If set to `false`, it will prevent `stylis` from applying vendor prefixes to the CSS.
 
 ### Global Options
 
 All of the props available are also available as global options for all instances that can be set with the `setGlobalOptions` method:
 
 ```javascript
-import Style from 'react-style-tag';
+import { setGlobalOptions } from "react-style-tag";
 
-Style.setGlobalOptions({
-  doNotPrefix: true,
+setGlobalOptions({
+  isCompressed: false,
   hasSourceMap: true,
   isMinified: true,
-  autoprefixerOptions: { remove: true }
+  isPrefixed: false
 });
 ```
 
-All default values are the same as those available for props. A common use case would be something like:
+The `setGlobalOptions` method is also available as a static method on the `Style` component:
 
 ```javascript
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+import { Style } from "react-style-tag";
 
 Style.setGlobalOptions({
-  hasSourceMap: !IS_PRODUCTION,
-  isMinified: IS_PRODUCTION
+  isCompressed: false,
+  hasSourceMap: true,
+  isMinified: true,
+  isPrefixed: false
 });
-
-<Style>
-  .test {
-    display: block;
-  }
-</Style>
 ```
-
-### Additional webpack configuration requirements
-
-`react-style-tag` makes use of PostCSS, which has server-side methods that are not used. As such, it expects the `fs` module to be present, which means you will need to stub it. In your webpack config, add the following object top-level:
-
-```javascript
-node: {
-  fs: 'empty'
-}
-```
-
-Additionally, PostCSS makes heavy use of JSON internally, so you will likely need to add `json-loader` to your list of loaders.
 
 ### Development
 
 Standard stuff, clone the repo and `npm i` to get the dependencies. npm scripts available:
-* `dev` => runs the webpack dev server for the playground
-* `lint` => runs ESLint against files in the `src` folder
-* `prepublish` => if in publish, runs `prepublish:compile`
-* `prepublish:compile` => runs the `lint` and `transpile` scripts
-* `transpile` => runs Babel against files in `src` to files in `lib`
 
-#### Todo
-* Add tests with AVA / Enzyme
+* `build` => run rollup to build `dist` files with NODE_ENV=production
+* `dev` => run webpack dev server to run example app / playground
+* `dist` => runs `build` and `build:minified`
+* `lint` => run ESLint against all files in the `src` folder
+* `lint:fix` => runs `lint` with `--fix`
+* `prepublish` => runs `prepublish:compile` when publishing
+* `prepublish:compile` => run `lint`, `test:coverage`, `transpile:es`, `transpile:lib`, `dist`
+* `test` => run AVA test functions with `NODE_ENV=test`
+* `test:coverage` => run `test` but with `nyc` for coverage checker
+* `test:watch` => run `test`, but with persistent watcher
+* `transpile:lib` => run babel against all files in `src` to create files in `lib`
+* `transpile:es` => run babel against all files in `src` to create files in `es`, preserving ES2015 modules (for
+  [`pkg.module`](https://github.com/rollup/rollup/wiki/pkg.module))

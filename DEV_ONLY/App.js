@@ -1,14 +1,13 @@
 import 'babel-polyfill';
 
 import PropTypes from 'prop-types';
-import React, {Component} from 'react';
-import {render} from 'react-dom';
+import React, {PureComponent} from 'react';
 
-import Style, {hashKeys} from '../src';
+import {hashKeys, Style} from '../src';
 
 const keys = ['test', 'foo', 'bar'];
 
-const {foo, test} = hashKeys(keys);
+const {foo, bar, test} = hashKeys(keys);
 
 /**
  * get a random color for the text
@@ -27,86 +26,82 @@ Style.setGlobalOptions({
   hasSourceMap: true
 });
 
-const RegularDiv = ({color}) => {
-  return (
-    <div>
-      <div className={foo}>I do not toggle</div>
+const RegularDiv = ({color}) => (
+  <div>
+    <div className={foo}>I do not toggle</div>
 
-      <Style>{`
+    <Style>
+      {`
         .${foo} {
           color: ${color};
           transition: color 250ms ease-in-out;
         }
-      `}</Style>
-    </div>
-  );
-};
+      `}
+    </Style>
+  </div>
+);
 
 RegularDiv.propTypes = {
   color: PropTypes.string
 };
 
-const CustomAutoprefixerDiv = ({color}) => {
-  return (
-    <div>
-      <div className={foo}>I have no flexbox prefixes</div>
+const UnprefixedDiv = ({color}) => (
+  <div>
+    <div className={bar}>I have no prefixes</div>
 
-      <Style
-        autoprefixerOptions={{
-          flexbox: false
-        }}
-      >{`
-        .${foo} {
+    <Style isPrefixed={false}>
+      {`
+        .${bar} {
           color: ${color};
           display: inline-flex;
           transition: color 250ms ease-in-out;
         }
-      `}</Style>
-    </div>
-  );
-};
+      `}
+    </Style>
+  </div>
+);
 
-CustomAutoprefixerDiv.propTypes = {
+UnprefixedDiv.propTypes = {
   color: PropTypes.string
 };
 
-const ToggledDiv = ({color, id}) => {
-  return (
-    <div>
-      <div className={test}>I toggle</div>
+const ToggledDiv = ({color, id}) => (
+  <div>
+    <div className={test}>I toggle</div>
 
-      <Style id={id}>{`
+    <Style id={id}>
+      {`
         .${test} {
           color: ${color};
           display: inline-flex;
           transition: color 250ms ease-in-out;
         }
-
-        @media screen and (min-width: 1000px) {
-          html {
-            background-color: lightgray;
-          }
-        }
-      `}</Style>
-    </div>
-  );
-};
+      `}
+    </Style>
+  </div>
+);
 
 ToggledDiv.propTypes = {
   color: PropTypes.string,
   id: PropTypes.string
 };
 
-class App extends Component {
-  static propTypes = {
-    color: PropTypes.string
-  };
-
+class App extends PureComponent {
   state = {
-    isToggledDivShown: true
+    hasSourceMap: false,
+    isToggledDivShown: false,
+    isVisible: true
   };
 
-  onClickToggle = () => {
+  componentDidMount() {
+    setInterval(() => {
+      this.setState(({hasSourceMap}) => ({
+        hasSourceMap: !hasSourceMap
+      }));
+    }, 5000);
+  }
+
+  onClickToggleDiv = () => {
     const {isToggledDivShown} = this.state;
 
     this.setState({
@@ -114,14 +109,29 @@ class App extends Component {
     });
   };
 
+  onToggleVisible = () => {
+    this.setState(({isVisible}) => ({
+      isVisible: !isVisible
+    }));
+  };
+
   render() {
-    const {color} = this.props;
-    const {isToggledDivShown} = this.state;
+    const {hasSourceMap, isToggledDivShown, isVisible} = this.state;
+
+    const color = getRandomColor();
 
     return (
       <div>
+        <h1>App</h1>
+
+        <div>
+          <button onClick={this.onToggleVisible}>Click to toggle main style</button>
+        </div>
+
+        <span className="foo">When hovered, I turn red.</span>
+
         <button
-          onClick={this.onClickToggle}
+          onClick={this.onClickToggleDiv}
           type="button"
         >
           Toggle div
@@ -133,34 +143,80 @@ class App extends Component {
 
         <br />
 
-        <CustomAutoprefixerDiv color={color} />
+        <UnprefixedDiv color={color} />
 
         <br />
 
-        {isToggledDivShown && <ToggledDiv
-          color={color}
-          id="toggle-one"
-                              />}
+        {isToggledDivShown && (
+          /* eslint-disable prettier */
+          <ToggledDiv
+            color={color}
+            id="toggle-one"
+          />
+          /* eslint-enable */
+        )}
 
         <br />
 
-        {isToggledDivShown && <ToggledDiv
-          color={color}
-          id="toggle-two"
-                              />}
+        {isToggledDivShown && (
+          /* eslint-disable prettier */
+          <ToggledDiv
+            color={color}
+            id="toggle-two"
+          />
+          /* eslint-enable */
+        )}
+
+        {isVisible && (
+          <Style
+            hasSourceMap={hasSourceMap}
+            // isMinified
+          >
+            {`
+          @keyframes test {
+            0% {
+              opacity; 1;
+            }
+
+            50% {
+              opacity: 0.5;
+            }
+
+            100% {
+              opacity: 1;
+            }
+          }
+
+          .foo {
+            animation: test 1000ms infinite;
+            display: block;
+            margin-bottom: 15px;
+
+            &:hover {
+              background-color: red;
+              color: white;
+            }
+          }
+
+          @media screen and (min-width: 1000px) {
+            .foo {
+              color: ${getRandomColor()};
+            }
+          }
+
+          .${keys.bar} {
+            display: flex;
+
+            &:focus {
+              text-decoration: underline;
+            }
+          }
+        `}
+          </Style>
+        )}
       </div>
     );
   }
 }
 
-const div = document.createElement('div');
-
-div.id = 'app-container';
-
-setInterval(() => {
-  render(<App color={getRandomColor()} />, div);
-}, 2500);
-
-render(<App color={getRandomColor()} />, div);
-
-document.body.appendChild(div);
+export default App;

@@ -1,12 +1,68 @@
 {
-  "presets": [
-    [
-      "env",
-      {
-        "loose": true
-      }
-    ],
-    "react",
-    "stage-2"
-  ]
+  "env": {
+    "development": {
+      "presets": [
+        [
+          "env",
+          {
+            "loose": true,
+            "modules": false
+          }
+        ],
+        "react",
+        "stage-2"
+      ]
+    },
+    "es": {
+      "presets": [
+        [
+          "env",
+          {
+            "loose": true,
+            "modules": false
+          }
+        ],
+        "react",
+        "stage-2"
+      ]
+    },
+    "lib": {
+      "presets": [
+        [
+          "env",
+          {
+            "loose": true
+          }
+        ],
+        "react",
+        "stage-2"
+      ]
+    },
+    "production": {
+      "plugins": ["transform-react-remove-prop-types"],
+      "presets": [
+        [
+          "env",
+          {
+            "loose": true,
+            "modules": false
+          }
+        ],
+        "react",
+        "stage-2"
+      ]
+    },
+    "test": {
+      "presets": [
+        [
+          "env",
+          {
+            "loose": true
+          }
+        ],
+        "react",
+        "stage-2"
+      ]
+    }
+  }
 }

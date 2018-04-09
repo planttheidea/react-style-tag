@@ -1,14 +1,10 @@
-// component
+// components
 import Style from './Style';
 
 // hash
 import {hashKeys} from './hash';
 
-// transform
-import {minify, prefixCss} from './transform';
+// options
+import {setGlobalOptions} from './options';
 
-export {hashKeys};
-export {minify as minifyCss};
-export {prefixCss};
-
-export default Style;
+export {hashKeys, setGlobalOptions, Style};

@@ -1,6 +1,5 @@
 // test
 import test from 'ava';
-import _ from 'lodash';
 import React from 'react';
 import sinon from 'sinon';
 import {shallow} from 'enzyme';
@@ -8,508 +7,349 @@ import toJson from 'enzyme-to-json';
 
 // src
 import * as component from 'src/Style';
-import * as cache from 'src/cache';
-import * as constants from 'src/constants';
-import * as transform from 'src/transform';
-import * as utils from 'src/utils';
+import * as blob from 'src/blob';
+import * as options from 'src/options';
+import * as styles from 'src/styles';
 
-const LINK_HREF = '__LINK_HREF__';
+const Style = component.default;
 
-test('if createAssignRefToInstance will assign a ref to the instance at refName', (t) => {
-  const refName = 'foo';
+test('if componentDidMount will call relocateNode with the node', (t) => {
   const instance = {
-    [refName]: null
+    node: {},
+    relocateNode: sinon.spy()
   };
 
-  const assignRefToInstance = component.createAssignRefToInstance(instance, refName);
+  component.componentDidMount(instance);
 
-  t.true(_.isFunction(assignRefToInstance));
+  t.true(instance.relocateNode.calledOnce);
+  t.true(instance.relocateNode.calledWith(instance.node));
+});
 
-  const element = {};
+test('if getSnapshotBeforeUpdate will call returnNode', (t) => {
+  const instance = {
+    node: {},
+    props: {
+      hasSourceMap: true
+    },
+    returnNode: sinon.spy()
+  };
+  const args = [{...instance.props}];
 
-  assignRefToInstance(element);
+  const result = component.getSnapshotBeforeUpdate(instance, args);
 
-  t.is(instance[refName], element);
-  t.deepEqual(instance, {
-    [refName]: element
+  t.true(instance.returnNode.calledOnce);
+  t.true(instance.returnNode.calledWith(instance.node));
+
+  t.is(result, null);
+});
+
+test('if componentDidUpdate will relocate the node even if nothing has changed', (t) => {
+  const instance = {
+    getStyleForState() {},
+    node: {},
+    props: {
+      children: '.foo { display: flex; }',
+      hasSourceMap: true
+    },
+    relocateNode: sinon.spy(),
+    setState: sinon.spy()
+  };
+  const args = [{...instance.props}];
+
+  component.componentDidUpdate(instance, args);
+
+  t.true(instance.relocateNode.calledOnce);
+  t.true(instance.relocateNode.calledWith(instance.node));
+
+  t.true(instance.setState.notCalled);
+});
+
+test('if componentDidUpdate will set the new style in state if children have changed', (t) => {
+  const instance = {
+    getStyleForState() {},
+    node: {},
+    props: {
+      children: '.foo { display: flex; }',
+      hasSourceMap: true
+    },
+    relocateNode: sinon.spy(),
+    setState: sinon.spy()
+  };
+  const args = [{...instance.props, children: '.foo { display: inline-flex; }'}];
+
+  component.componentDidUpdate(instance, args);
+
+  t.true(instance.relocateNode.calledOnce);
+  t.true(instance.relocateNode.calledWith(instance.node));
+
+  t.true(instance.setState.calledOnce);
+  t.true(instance.setState.calledWith(instance.getStyleForState));
+});
+
+test('if componentWillUnmount will return the node', (t) => {
+  const instance = {
+    node: {},
+    returnNode: sinon.spy()
+  };
+
+  component.componentWillUnmount(instance);
+
+  t.true(instance.returnNode.calledOnce);
+  t.true(instance.returnNode.calledWith(instance.node));
+});
+
+test('if getStyleForState will build the style based on the props passed', (t) => {
+  const instance = {
+    props: {
+      children: '.foo { display: flex; }',
+      isCompressed: true
+    }
+  };
+
+  const result = component.getStyleForState(instance);
+
+  t.deepEqual(result, {
+    style: styles.getRenderedStyles(instance.props.children, {
+      isCompressed: options.getCoalescedOption(instance.props, 'isCompressed'),
+      isMinified: options.getCoalescedOption(instance.props, 'isMinified'),
+      isPrefixed: options.getCoalescedOption(instance.props, 'isPrefixed')
+    })
   });
 });
 
-test('if createComponentDidMount will call setCorrectTag on the instance', (t) => {
+test.serial('if relocateNode will do nothing if there is no document', (t) => {
+  const doc = global.document;
+
+  global.document = undefined;
+
   const instance = {
-    setCorrectTag: sinon.spy()
+    node: null,
+    originalParent: null
   };
+  const args = [
+    {
+      parentNode: {
+        removeChild: sinon.spy()
+      }
+    }
+  ];
 
-  const componentDidMount = component.createComponentDidMount(instance);
+  try {
+    component.relocateNode(instance, args);
 
-  t.true(_.isFunction(componentDidMount));
-
-  componentDidMount();
-
-  t.true(instance.setCorrectTag.calledOnce);
+    t.pass();
+  } catch (error) {
+    t.fail(error);
+  } finally {
+    global.document = doc;
+  }
 });
 
-test('if createComponentDidUpdate calls setCacheId and setCorrectTag', (t) => {
+test.serial('if relocateNode will do nothing if there is no node', (t) => {
+  const stub = sinon.stub(document.head, 'appendChild');
+
   const instance = {
-    id: 'foo',
-    props: {
-      children: 'bar'
-    },
-    setCorrectTag: sinon.spy()
+    node: null,
+    originalParent: null
   };
+  const args = [null];
 
-  const componentDidUpdate = component.createComponentDidUpdate(instance);
+  try {
+    component.relocateNode(instance, args);
 
-  t.true(_.isFunction(componentDidUpdate));
+    t.true(stub.notCalled);
 
-  const stub = sinon.stub(cache, 'setCacheId');
+    t.pass();
+  } catch (error) {
+    t.fail(error);
+  } finally {
+    stub.restore();
+  }
+});
 
-  componentDidUpdate();
+test.serial('if relocateNode will move the node to the document head if document and node exist', (t) => {
+  const stub = sinon.stub(document.head, 'appendChild');
+
+  const instance = {
+    node: null,
+    originalParent: null
+  };
+  const args = [
+    {
+      parentNode: {
+        removeChild: sinon.spy()
+      }
+    }
+  ];
+
+  component.relocateNode(instance, args);
+
+  t.is(instance.originalParent, args[0].parentNode);
+
+  t.true(args[0].parentNode.removeChild.calledOnce);
+  t.true(args[0].parentNode.removeChild.calledWith(args[0]));
 
   t.true(stub.calledOnce);
-  t.true(stub.calledWith(instance.id, instance.props.children));
-
-  t.true(instance.setCorrectTag.calledOnce);
+  t.true(stub.calledWith(args[0]));
 
   stub.restore();
 });
 
-test.serial(
-  'if createComponentWillMount will only call getUrl and createIdForTag if blob support is not present',
-  (t) => {
-    const instance = {
-      id: null,
-      props: {
-        children: 'bar',
-        id: 'foo'
-      }
-    };
+test.serial('if returnNode will do nothing if there is no document', (t) => {
+  const doc = global.document;
 
-    const componentWillMount = component.createComponentWillMount(instance);
+  global.document = undefined;
 
-    t.true(_.isFunction(componentWillMount));
+  const instance = {
+    node: {},
+    originalParent: {
+      appendChild: sinon.spy()
+    }
+  };
+  const args = [instance.node];
 
-    const urlStub = sinon.stub(utils, 'getUrl');
-    const blobSupportStub = sinon.stub(utils, 'getHasBlobSupport');
+  try {
+    component.returnNode(instance, args);
 
-    const createIdStub = sinon.stub(cache, 'createIdForTag').returns(instance.props.id);
+    t.true(instance.originalParent.appendChild.notCalled);
 
-    componentWillMount();
-
-    t.true(urlStub.calledOnce);
-
-    t.true(blobSupportStub.notCalled);
-
-    t.true(createIdStub.calledOnce);
-    t.true(createIdStub.calledWith(instance.props.id, instance.props.children));
-
-    urlStub.restore();
-    blobSupportStub.restore();
-    createIdStub.restore();
+    t.pass();
+  } catch (error) {
+    t.fail(error);
+  } finally {
+    global.document = doc;
   }
-);
+});
 
-test.serial('if createComponentWillMount will call get getHasBlobSupport if url exists', (t) => {
+test.serial('if returnNode will do nothing if there is no node', (t) => {
+  const stub = sinon.stub(document.head, 'removeChild');
+
   const instance = {
-    id: null,
-    props: {
-      children: 'bar',
-      id: 'foo'
+    node: {},
+    originalParent: {
+      appendChild: sinon.spy()
     }
   };
+  const args = [null];
 
-  const componentWillMount = component.createComponentWillMount(instance);
+  try {
+    component.returnNode(instance, args);
 
-  t.true(_.isFunction(componentWillMount));
+    t.true(instance.originalParent.appendChild.notCalled);
 
-  const urlStub = sinon.stub(utils, 'getUrl').returns({
-    createObjectURL: sinon.stub().returns(LINK_HREF)
-  });
-  const blobSupportStub = sinon.stub(utils, 'getHasBlobSupport').returns(true);
+    t.true(stub.notCalled);
 
-  const createIdStub = sinon.stub(cache, 'createIdForTag').returns(instance.props.id);
-
-  componentWillMount();
-
-  t.true(urlStub.calledOnce);
-
-  t.true(blobSupportStub.calledOnce);
-
-  t.true(createIdStub.calledOnce);
-  t.true(createIdStub.calledWith(instance.props.id, instance.props.children));
-
-  urlStub.restore();
-  blobSupportStub.restore();
-  createIdStub.restore();
-});
-
-test('if createComponentWillUnmount will call removeTagFromHead and removeIdFromCache', (t) => {
-  const instance = {
-    id: 'foo',
-    removeTagFromHead: sinon.spy()
-  };
-
-  const componentWillUnmount = component.createComponentWillUnmount(instance);
-
-  t.true(_.isFunction(componentWillUnmount));
-
-  const removeIdStub = sinon.stub(cache, 'removeIdFromCache');
-
-  componentWillUnmount();
-
-  t.true(instance.removeTagFromHead.calledTwice);
-  t.is(instance.removeTagFromHead.getCall(0).args[0], 'link');
-  t.is(instance.removeTagFromHead.getCall(1).args[0], 'style');
-
-  t.true(removeIdStub.calledOnce);
-  t.true(removeIdStub.calledWith(instance.id));
-
-  removeIdStub.restore();
-});
-
-test('if createComponentWillUnmount will mpt call removeIdFromCache if id is null', (t) => {
-  const instance = {
-    id: null,
-    removeTagFromHead: sinon.spy()
-  };
-
-  const componentWillUnmount = component.createComponentWillUnmount(instance);
-
-  t.true(_.isFunction(componentWillUnmount));
-
-  const removeIdStub = sinon.stub(cache, 'removeIdFromCache');
-
-  componentWillUnmount();
-
-  t.true(instance.removeTagFromHead.calledTwice);
-  t.is(instance.removeTagFromHead.getCall(0).args[0], 'link');
-  t.is(instance.removeTagFromHead.getCall(1).args[0], 'style');
-
-  t.true(removeIdStub.notCalled);
-
-  removeIdStub.restore();
-});
-
-test.serial(
-  'if createRemoveTagFromHead will create a method that that gets the tag from the instance and removes it from the head',
-  (t) => {
-    const tagType = 'foo';
-    const tag = {};
-    const instance = {
-      [tagType]: tag
-    };
-
-    const removeTagFromHead = component.createRemoveTagFromHead(instance);
-
-    t.true(_.isFunction(removeTagFromHead));
-
-    const removeChildStub = sinon.stub(document.head, 'removeChild');
-
-    removeTagFromHead(tagType);
-
-    t.true(removeChildStub.calledOnce);
-    t.true(removeChildStub.calledWith(tag));
-    t.is(instance[tagType], null);
-
-    removeChildStub.restore();
+    t.pass();
+  } catch (error) {
+    t.fail(error);
+  } finally {
+    stub.restore();
   }
-);
+});
 
-test('if createSetCorrectTag will call the right tag function based on hasSourceMap being false', (t) => {
+test.serial('if returnNode will move the node to the document head if document and node exist', (t) => {
+  const stub = sinon.stub(document.head, 'removeChild');
+
+  const originalParent = {
+    appendChild: sinon.spy()
+  };
+
   const instance = {
-    id: 'foo',
-    props: {
-      hasSourceMap: undefined
-    },
-    setLinkTag: sinon.spy(),
-    setStyleTag: sinon.spy()
+    node: {},
+    originalParent
   };
-  const getCoalescedPropsValue = sinon.spy(transform, 'getCoalescedPropsValue');
+  const args = [instance.node];
 
-  const setCorrectTag = component.createSetCorrectTag(instance);
+  component.returnNode(instance, args);
 
-  t.true(_.isFunction(setCorrectTag));
+  t.is(instance.originalParent, null);
 
-  setCorrectTag();
+  t.true(originalParent.appendChild.calledOnce);
+  t.true(originalParent.appendChild.calledWith(args[0]));
 
-  t.true(getCoalescedPropsValue.calledOnce);
+  t.true(stub.calledOnce);
+  t.true(stub.calledWith(args[0]));
 
-  t.true(instance.setLinkTag.notCalled);
-
-  t.true(instance.setStyleTag.calledOnce);
-
-  transform.getCoalescedPropsValue.restore();
+  stub.restore();
 });
 
-test('if createSetCorrectTag will call the right tag function based on hasSourceMap being true', (t) => {
-  const instance = {
-    id: 'foo',
-    props: {
-      hasSourceMap: true
-    },
-    setLinkTag: sinon.spy(),
-    setStyleTag: sinon.spy()
-  };
-  const getCoalescedPropsValue = sinon.spy(transform, 'getCoalescedPropsValue');
-
-  const setCorrectTag = component.createSetCorrectTag(instance);
-
-  t.true(_.isFunction(setCorrectTag));
-
-  setCorrectTag();
-
-  t.true(getCoalescedPropsValue.calledOnce);
-
-  t.true(instance.setLinkTag.calledOnce);
-
-  t.true(instance.setStyleTag.notCalled);
-
-  transform.getCoalescedPropsValue.restore();
-});
-
-test('if createSetCorrectTag will call nothing if the instance id is null', (t) => {
-  const instance = {
-    id: null,
-    props: {
-      hasSourceMap: undefined
-    },
-    setLinkTag: sinon.spy(),
-    setStyleTag: sinon.spy()
-  };
-  const getCoalescedPropsValue = sinon.spy(transform, 'getCoalescedPropsValue');
-
-  const setCorrectTag = component.createSetCorrectTag(instance);
-
-  t.true(_.isFunction(setCorrectTag));
-
-  setCorrectTag();
-
-  t.true(getCoalescedPropsValue.notCalled);
-
-  t.true(instance.setLinkTag.notCalled);
-
-  t.true(instance.setStyleTag.notCalled);
-
-  transform.getCoalescedPropsValue.restore();
-});
-
-test.serial('if createSetLinkTag will create a link tag with the correct values', (t) => {
-  const instance = {
-    link: {
-      href: null
-    },
-    props: {
-      children: 'foo',
-      doNotPrefix: false,
-      isMinified: false,
-      autoprefixerOptions: constants.DEFAULT_AUTOPREFIXER_OPTIONS
-    },
-    removeTagFromHead: sinon.spy()
+test.serial('if Style will render correctly with default props', (t) => {
+  const props = {
+    children: '.foo { display: flex; }'
   };
 
-  const setLinkTag = component.createSetLinkTag(instance);
-
-  t.true(_.isFunction(setLinkTag));
-
-  const transformCssStub = sinon.stub(transform, 'getTransformedCss').returns(instance.props.children);
-
-  global.window = {
-    Blob: sinon.spy()
-  };
-
-  const appendChildStub = sinon.stub(document.head, 'appendChild');
-
-  component.createComponentWillMount(instance)();
-
-  t.notThrows(() => {
-    setLinkTag();
-  });
-
-  transformCssStub.restore();
-
-  t.true(instance.removeTagFromHead.calledOnce);
-  t.true(instance.removeTagFromHead.calledWith('style'));
-
-  t.true(window.Blob.calledOnce);
-  t.deepEqual(window.Blob.getCall(0).args, [
-    [instance.props.children],
-    {
-      type: 'text/css'
-    }
-  ]);
-
-  t.is(instance.link.href, LINK_HREF);
-
-  t.true(appendChildStub.calledOnce);
-  t.true(appendChildStub.calledWith(instance.link));
-
-  global.window.Blob = undefined;
-
-  appendChildStub.restore();
-});
-
-test.serial('if createSetStyleTag will create a link tag with the correct values', (t) => {
-  const instance = {
-    style: {
-      textContent: null
-    },
-    props: {
-      children: 'foo',
-      doNotPrefix: false,
-      isMinified: false,
-      autoprefixerOptions: constants.DEFAULT_AUTOPREFIXER_OPTIONS
-    },
-    removeTagFromHead: sinon.spy()
-  };
-
-  const setStyleTag = component.createSetStyleTag(instance);
-
-  t.true(_.isFunction(setStyleTag));
-
-  const transformCssStub = sinon.stub(transform, 'getTransformedCss').returns(instance.props.children);
-  const appendChildStub = sinon.stub(document.head, 'appendChild');
-
-  component.createComponentWillMount(instance)();
-
-  t.notThrows(() => {
-    setStyleTag();
-  });
-
-  transformCssStub.restore();
-
-  t.true(instance.removeTagFromHead.calledOnce);
-  t.true(instance.removeTagFromHead.calledWith('link'));
-
-  t.true(transformCssStub.calledOnce);
-
-  t.is(instance.style.textContent, instance.props.children);
-
-  t.true(appendChildStub.calledOnce);
-  t.true(appendChildStub.calledWith(instance.style));
-
-  appendChildStub.restore();
-});
-
-test('if createShouldComponentUpdate correctly compares children that are the same', (t) => {
-  const instance = {
-    props: {
-      children: 'foo'
-    }
-  };
-
-  const shouldComponentUpdate = component.createShouldComponentUpdate(instance);
-
-  t.true(_.isFunction(shouldComponentUpdate));
-
-  const nextProps = {
-    children: 'foo'
-  };
-
-  const result = shouldComponentUpdate(nextProps);
-
-  t.false(result);
-});
-
-test('if createShouldComponentUpdate correctly compares children that are different', (t) => {
-  const instance = {
-    props: {
-      children: 'foo'
-    }
-  };
-
-  const shouldComponentUpdate = component.createShouldComponentUpdate(instance);
-
-  t.true(_.isFunction(shouldComponentUpdate));
-
-  const nextProps = {
-    children: 'bar'
-  };
-
-  const result = shouldComponentUpdate(nextProps);
-
-  t.true(result);
-});
-
-test('if setGlobalOptions have the correct defaults', (t) => {
-  const result = component.setGlobalOptions({});
-
-  t.deepEqual(result, constants.DEFAULT_REACT_STYLE_TAG_GLOBAL_PROPERTIES);
-});
-
-test('if setGlobalOptions will set the global properties based on the options passed', (t) => {
-  const overrides = {
-    doNotPrefix: true,
-    isMinified: true,
-    autoprefixerOptions: {
-      flexbox: true,
-      grid: true
-    }
-  };
-
-  const result = component.setGlobalOptions(overrides);
-
-  t.deepEqual(result, {
-    ...constants.DEFAULT_REACT_STYLE_TAG_GLOBAL_PROPERTIES,
-    doNotPrefix: true,
-    isMinified: true,
-    autoprefixerOptions: {
-      flexbox: true,
-      grid: true
-    }
-  });
-});
-
-test.skip('if Style will render correctly when using a style tag', (t) => {
-  const Style = component.default;
-  const id = 'foo';
-
-  const wrapper = shallow(
-    <Style id={id}>
-      {`
-      .foo {
-        display: block;
-      }
-    `}
-    </Style>
-  );
+  const wrapper = shallow(<Style {...props} />);
 
   t.snapshot(toJson(wrapper));
+
+  blob.getUrl.reset();
+  blob.hasBlobSupport.reset();
 });
 
-test.skip('if Style will render correctly when using a link tag', (t) => {
-  const Style = component.default;
-  const id = 'foo';
+test.serial('if Style will render correctly with sourceMaps and additional props', (t) => {
+  const props = {
+    children: '.foo { display: flex; }',
+    'data-foo': 'bar'
+  };
 
-  const wrapper = shallow(
-    <Style
-      hasSourceMap
-      id={id}
-    >{`
-    .foo {
-      display: block;
-    }
-  `}</Style>
-  );
+  const wrapper = shallow(<Style {...props} />);
 
   t.snapshot(toJson(wrapper));
+
+  blob.getUrl.reset();
+  blob.hasBlobSupport.reset();
 });
 
-test.skip('if Style will render correctly when id is null', (t) => {
-  const Style = component.default;
-  const id = null;
+test.serial('if Style will render correctly with default props when blob support does not exist', (t) => {
+  const props = {
+    children: '.foo { display: flex; }'
+  };
 
-  const wrapper = shallow(
-    <Style
-      hasSourceMap
-      id={id}
-    >
-      {`
-    .foo {
-      display: block;
-    }
-  `}{' '}
-    </Style>
-  );
+  const existingBlob = window.Blob;
 
-  t.is(wrapper.type(), null);
+  window.Blob = undefined;
+
+  const stub = sinon.stub(console, 'error');
+
+  const wrapper = shallow(<Style {...props} />);
+
+  t.true(stub.calledOnce);
+
+  stub.restore();
+
+  t.snapshot(toJson(wrapper));
+
+  blob.getUrl.reset();
+  blob.hasBlobSupport.reset();
+
+  window.blob = existingBlob;
+});
+
+test.serial('if Style will render correctly with no sourceMap requested', (t) => {
+  const props = {
+    children: '.foo { display: flex; }',
+    hasSourceMap: false
+  };
+
+  const wrapper = shallow(<Style {...props} />);
+
+  t.snapshot(toJson(wrapper));
+
+  blob.getUrl.reset();
+  blob.hasBlobSupport.reset();
+});
+
+test.serial('if Style will render correctly with no sourceMap requested and additional props', (t) => {
+  const props = {
+    children: '.foo { display: flex; }',
+    'data-foo': 'bar',
+    hasSourceMap: false
+  };
+
+  const wrapper = shallow(<Style {...props} />);
+
+  t.snapshot(toJson(wrapper));
+
+  blob.getUrl.reset();
+  blob.hasBlobSupport.reset();
 });
