@@ -16,7 +16,6 @@ Write styles declaratively in React
   * [isPrefixed](#isprefixed)
 * [Global Options](#global-options)
 * [Development](#development)
-* [Todo](#todo)
 
 ## Installation
 
