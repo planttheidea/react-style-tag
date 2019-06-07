@@ -13,6 +13,12 @@ import * as styles from 'src/styles';
 
 const Style = component.default;
 
+function setDocument(value) {
+  Object.defineProperty(global, 'document', {
+    value
+  });
+}
+
 test('if componentDidMount will call relocateNode with the node', (t) => {
   const instance = {
     node: {},
@@ -120,7 +126,7 @@ test('if getStyleForState will build the style based on the props passed', (t) =
 test.serial('if relocateNode will do nothing if there is no document', (t) => {
   const doc = global.document;
 
-  global.document = undefined;
+  setDocument();
 
   const instance = {
     node: null,
@@ -141,7 +147,7 @@ test.serial('if relocateNode will do nothing if there is no document', (t) => {
   } catch (error) {
     t.fail(error);
   } finally {
-    global.document = doc;
+    setDocument(doc);
   }
 });
 
@@ -198,7 +204,7 @@ test.serial('if relocateNode will move the node to the document head if document
 test.serial('if returnNode will do nothing if there is no document', (t) => {
   const doc = global.document;
 
-  global.document = undefined;
+  setDocument();
 
   const instance = {
     node: {},
@@ -217,7 +223,7 @@ test.serial('if returnNode will do nothing if there is no document', (t) => {
   } catch (error) {
     t.fail(error);
   } finally {
-    global.document = doc;
+    setDocument(doc);
   }
 });
 

@@ -5,16 +5,22 @@ import sinon from 'sinon';
 // src
 import * as blob from 'src/blob';
 
+function setWindow(value) {
+  Object.defineProperty(global, 'window', {
+    value
+  });
+}
+
 test.serial('if getUrl will return an empty object when window is undefined', (t) => {
   const win = global.window;
 
-  global.window = undefined;
+  setWindow();
 
   const result = blob.getUrl();
 
   t.deepEqual(result, {});
 
-  global.window = win;
+  setWindow(win);
 
   blob.getUrl.reset();
 });
@@ -28,16 +34,16 @@ test.serial('if getUrl will return the URL when window is defined and so is wind
     webkitURL: 'webkitURL'
   };
 
-  global.window = {
+  setWindow({
     URL,
     webkitURL
-  };
+  });
 
   const result = blob.getUrl();
 
   t.is(result, URL);
 
-  global.window = win;
+  setWindow(win);
 
   blob.getUrl.reset();
 });
@@ -50,15 +56,15 @@ test.serial(
       webkitURL: 'webkitURL'
     };
 
-    global.window = {
+    setWindow({
       webkitURL
-    };
+    });
 
     const result = blob.getUrl();
 
     t.is(result, webkitURL);
 
-    global.window = win;
+    setWindow(win);
 
     blob.getUrl.reset();
   }
@@ -67,13 +73,13 @@ test.serial(
 test.serial('if getHasBlobSupport will return false if window is undefined', (t) => {
   const win = global.window;
 
-  global.window = undefined;
+  setWindow();
 
   const result = blob.getHasBlobSupport();
 
   t.false(result);
 
-  global.window = win;
+  setWindow(win);
 
   blob.getUrl.reset();
 });
@@ -81,13 +87,13 @@ test.serial('if getHasBlobSupport will return false if window is undefined', (t)
 test.serial('if getHasBlobSupport will return false if window.Blob is not a function', (t) => {
   const win = global.window;
 
-  global.window = {};
+  setWindow({});
 
   const result = blob.getHasBlobSupport();
 
   t.false(result);
 
-  global.window = win;
+  setWindow(win);
 
   blob.getUrl.reset();
 });
@@ -95,15 +101,15 @@ test.serial('if getHasBlobSupport will return false if window.Blob is not a func
 test.serial('if getHasBlobSupport will return false if createObjectURL is not a function', (t) => {
   const win = global.window;
 
-  global.window = {
+  setWindow({
     URL: {}
-  };
+  });
 
   const result = blob.getHasBlobSupport();
 
   t.false(result);
 
-  global.window = win;
+  setWindow(win);
 
   blob.getUrl.reset();
 });
@@ -111,20 +117,20 @@ test.serial('if getHasBlobSupport will return false if createObjectURL is not a 
 test.serial('if getHasBlobSupport will return false if window.Blob fails', (t) => {
   const win = global.window;
 
-  global.window = {
+  setWindow({
     Blob() {
       throw new Error('boom');
     },
     URL: {
       createObjectURL() {}
     }
-  };
+  });
 
   const result = blob.getHasBlobSupport();
 
   t.false(result);
 
-  global.window = win;
+  setWindow(win);
 
   blob.getUrl.reset();
 });
@@ -132,18 +138,18 @@ test.serial('if getHasBlobSupport will return false if window.Blob fails', (t) =
 test.serial('if getHasBlobSupport will return true if window.Blob succeeds', (t) => {
   const win = global.window;
 
-  global.window = {
+  setWindow({
     Blob() {},
     URL: {
       createObjectURL() {}
     }
-  };
+  });
 
   const result = blob.getHasBlobSupport();
 
   t.true(result);
 
-  global.window = win;
+  setWindow(win);
 
   blob.getUrl.reset();
 });
@@ -151,13 +157,13 @@ test.serial('if getHasBlobSupport will return true if window.Blob succeeds', (t)
 test('if hasBlobSupport returns false when getHasBlobSupport does', (t) => {
   const win = global.window;
 
-  global.window = undefined;
+  setWindow();
 
   const result = blob.hasBlobSupport();
 
   t.false(result);
 
-  global.window = win;
+  setWindow(win);
 
   blob.getUrl.reset();
   blob.hasBlobSupport.reset();
@@ -166,18 +172,18 @@ test('if hasBlobSupport returns false when getHasBlobSupport does', (t) => {
 test('if hasBlobSupport returns true when getHasBlobSupport does', (t) => {
   const win = global.window;
 
-  global.window = {
+  setWindow({
     Blob() {},
     URL: {
       createObjectURL() {}
     }
-  };
+  });
 
   const result = blob.hasBlobSupport();
 
   t.true(result);
 
-  global.window = win;
+  setWindow(win);
 
   blob.getUrl.reset();
   blob.hasBlobSupport.reset();
@@ -186,7 +192,7 @@ test('if hasBlobSupport returns true when getHasBlobSupport does', (t) => {
 test('if getLinkHref will return null when there is no blob support', (t) => {
   const win = global.window;
 
-  global.window = undefined;
+  setWindow();
 
   const style = '.foo{display: block;}';
 
@@ -194,7 +200,7 @@ test('if getLinkHref will return null when there is no blob support', (t) => {
 
   t.is(result, null);
 
-  global.window = win;
+  setWindow(win);
 
   blob.getUrl.reset();
   blob.hasBlobSupport.reset();
@@ -208,7 +214,7 @@ test.serial('if getLinkHref will return the proper dataURI when there is blob su
   const style = '.foo{display: block;}';
 
   /* eslint-disable prefer-arrow-callback */
-  global.window = {
+  setWindow({
     Blob: sinon
       .stub()
       .onFirstCall()
@@ -221,7 +227,7 @@ test.serial('if getLinkHref will return the proper dataURI when there is blob su
     URL: {
       createObjectURL: sinon.stub().returns(expectedResult)
     }
-  };
+  });
   /* eslint-enable */
 
   const result = blob.getLinkHref(style);
@@ -234,7 +240,7 @@ test.serial('if getLinkHref will return the proper dataURI when there is blob su
 
   t.is(result, expectedResult);
 
-  global.window = win;
+  setWindow(win);
 
   blob.getUrl.reset();
   blob.hasBlobSupport.reset();
@@ -243,7 +249,7 @@ test.serial('if getLinkHref will return the proper dataURI when there is blob su
 test.serial('if createGetCachedLinkHref will return the link href when it does not exist in cache', (t) => {
   const win = global.window;
 
-  global.window = {
+  setWindow({
     Blob(values) {
       this.value = values ? values[0] : null;
 
@@ -254,7 +260,7 @@ test.serial('if createGetCachedLinkHref will return the link href when it does n
         return fakeBlob.value;
       }
     }
-  };
+  });
 
   const getCachedLinkHref = blob.createGetCachedLinkHref();
 
@@ -264,7 +270,7 @@ test.serial('if createGetCachedLinkHref will return the link href when it does n
 
   t.is(result, style);
 
-  global.window = win;
+  setWindow(win);
 
   blob.getUrl.reset();
   blob.hasBlobSupport.reset();
@@ -273,7 +279,7 @@ test.serial('if createGetCachedLinkHref will return the link href when it does n
 test.serial('if createGetCachedLinkHref will return the link href from cache when it exists', (t) => {
   const win = global.window;
 
-  global.window = {
+  setWindow({
     Blob(values) {
       this.value = values ? values[0] : null;
 
@@ -284,7 +290,7 @@ test.serial('if createGetCachedLinkHref will return the link href from cache whe
         return fakeBlob.value;
       }
     }
-  };
+  });
 
   const spy = sinon.spy(global.window, 'Blob');
 
@@ -311,7 +317,7 @@ test.serial('if createGetCachedLinkHref will return the link href from cache whe
   t.true(spy.notCalled);
   t.is(finalResult, style);
 
-  global.window = win;
+  setWindow(win);
 
   blob.getUrl.reset();
   blob.hasBlobSupport.reset();
@@ -322,7 +328,7 @@ test.serial(
   (t) => {
     const win = global.window;
 
-    global.window = {
+    setWindow({
       Blob(values) {
         this.value = values ? values[0] : null;
 
@@ -333,9 +339,7 @@ test.serial(
           return fakeBlob.value;
         }
       }
-    };
-
-    const spy = sinon.spy(global.window, 'Blob');
+    });
 
     const getCachedLinkHref = blob.createGetCachedLinkHref();
 
@@ -345,7 +349,7 @@ test.serial(
 
     t.is(result, null);
 
-    global.window = win;
+    setWindow(win);
 
     blob.getUrl.reset();
     blob.hasBlobSupport.reset();
