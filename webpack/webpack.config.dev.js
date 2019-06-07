@@ -1,6 +1,5 @@
 'use strict';
 
-const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 
@@ -49,11 +48,5 @@ module.exports = Object.assign({}, defaultConfig, {
     })
   }),
 
-  plugins: [
-    ...defaultConfig.plugins,
-    new HtmlWebpackPlugin(),
-    new BundleAnalyzerPlugin({
-      openAnalyzer: false
-    })
-  ]
+  plugins: [...defaultConfig.plugins, new HtmlWebpackPlugin()]
 });
