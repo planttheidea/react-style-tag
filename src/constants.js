@@ -12,17 +12,19 @@ export const BEAUTIFY_OPTIONS = {
 /**
  * @constant {boolean} IS_PRODUCTION is the runtime in the production environment
  */
-export const IS_PRODUCTION = !!(process && process.env && process.env.NODE_ENV === 'production');
+export const IS_PRODUCTION = !!(
+  process &&
+  process.env &&
+  process.env.NODE_ENV === 'production'
+);
 
-/**
- * @constant {number} REACT_MINOR_VERSION the numeric major.minor version of React
- */
-export const REACT_MINOR_VERSION = +React.version
+const [REACT_MAJOR_VERSION, REACT_MINOR_VERSION] = React.version
   .split('.')
   .slice(0, 2)
-  .join('.');
+  .map(Number);
 
 /**
  * @constant {boolean} SUPPORTS_BEFORE_UPDATE_SNAPSHOT is getSnapshotBeforeUpdate supported by the React version
  */
-export const SUPPORTS_BEFORE_UPDATE_SNAPSHOT = !isNaN(REACT_MINOR_VERSION) && REACT_MINOR_VERSION >= 16.3;
+export const SUPPORTS_BEFORE_UPDATE_SNAPSHOT =
+  REACT_MAJOR_VERSION >= 16 && REACT_MINOR_VERSION >= 3;
