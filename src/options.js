@@ -38,5 +38,5 @@ export const setGlobalOptions = (options) =>
     (option) =>
       GLOBAL_OPTIONS.hasOwnProperty(option) &&
       typeof options[option] === 'boolean' &&
-      (GLOBAL_OPTIONS[option] = options[option])
+      (GLOBAL_OPTIONS[option] = options[option]),
   );
