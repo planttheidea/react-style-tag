@@ -1,4 +1,3 @@
-// external dependencies
 import React from 'react';
 
 /**
@@ -24,7 +23,7 @@ const [REACT_MAJOR_VERSION, REACT_MINOR_VERSION] = React.version
   .map(Number);
 
 /**
- * @constant {boolean} SUPPORTS_BEFORE_UPDATE_SNAPSHOT is getSnapshotBeforeUpdate supported by the React version
+ * @constant {boolean} HAS_UNSAFE_METHODS have lifecycle methods been prefixed with `UNSAFE_` in the React version
  */
-export const SUPPORTS_BEFORE_UPDATE_SNAPSHOT =
+export const HAS_UNSAFE_METHODS =
   REACT_MAJOR_VERSION >= 16 && REACT_MINOR_VERSION >= 3;

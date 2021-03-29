@@ -14,7 +14,10 @@ export const getUrl = (() => {
   const getUrl = () =>
     URL !== defaultObject
       ? URL
-      : (URL = typeof window !== 'undefined' ? window.URL || window.webkitURL : defaultObject);
+      : (URL =
+          typeof window !== 'undefined'
+            ? window.URL || window.webkitURL
+            : defaultObject);
 
   getUrl.reset = () => (URL = defaultObject);
 
@@ -71,7 +74,9 @@ export const hasBlobSupport = (() => {
  * @returns {string} the data URI built from the Blob
  */
 export const getLinkHref = (style) =>
-  hasBlobSupport() ? getUrl().createObjectURL(new window.Blob([style], {type: 'text/css'})) : null;
+  hasBlobSupport()
+    ? getUrl().createObjectURL(new window.Blob([style], {type: 'text/css'}))
+    : null;
 
 /**
  * @function createGetCachedLinkHref
@@ -87,5 +92,9 @@ export const createGetCachedLinkHref = () =>
         currentStyle = null;
 
     return (style) =>
-      style === currentStyle ? href : (currentStyle = style) ? (href = getLinkHref(style)) : (href = null);
+      style === currentStyle
+        ? href
+        : (currentStyle = style)
+          ? (href = getLinkHref(style))
+          : (href = null);
   })();
