@@ -2,7 +2,7 @@
 import test from 'ava';
 import React from 'react';
 import sinon from 'sinon';
-import {shallow} from 'enzyme';
+import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
 // src
@@ -15,14 +15,14 @@ const Style = component.default;
 
 function setDocument(value) {
   Object.defineProperty(global, 'document', {
-    value
+    value,
   });
 }
 
 test('if componentDidMount will call relocateNode with the node', (t) => {
   const instance = {
     node: {},
-    relocateNode: sinon.spy()
+    relocateNode: sinon.spy(),
   };
 
   component.componentDidMount(instance);
@@ -31,22 +31,20 @@ test('if componentDidMount will call relocateNode with the node', (t) => {
   t.true(instance.relocateNode.calledWith(instance.node));
 });
 
-test('if getSnapshotBeforeUpdate will call returnNode', (t) => {
+test('if componentWillUpdate will call returnNode', (t) => {
   const instance = {
     node: {},
     props: {
-      hasSourceMap: true
+      hasSourceMap: true,
     },
-    returnNode: sinon.spy()
+    returnNode: sinon.spy(),
   };
-  const args = [{...instance.props}];
+  const args = [{ ...instance.props }];
 
-  const result = component.getSnapshotBeforeUpdate(instance, args);
+  component.componentWillUpdate(instance, args);
 
   t.true(instance.returnNode.calledOnce);
   t.true(instance.returnNode.calledWith(instance.node));
-
-  t.is(result, null);
 });
 
 test('if componentDidUpdate will relocate the node even if nothing has changed', (t) => {
@@ -55,12 +53,12 @@ test('if componentDidUpdate will relocate the node even if nothing has changed',
     node: {},
     props: {
       children: '.foo { display: flex; }',
-      hasSourceMap: true
+      hasSourceMap: true,
     },
     relocateNode: sinon.spy(),
-    setState: sinon.spy()
+    setState: sinon.spy(),
   };
-  const args = [{...instance.props}];
+  const args = [{ ...instance.props }];
 
   component.componentDidUpdate(instance, args);
 
@@ -76,12 +74,14 @@ test('if componentDidUpdate will set the new style in state if children have cha
     node: {},
     props: {
       children: '.foo { display: flex; }',
-      hasSourceMap: true
+      hasSourceMap: true,
     },
     relocateNode: sinon.spy(),
-    setState: sinon.spy()
+    setState: sinon.spy(),
   };
-  const args = [{...instance.props, children: '.foo { display: inline-flex; }'}];
+  const args = [
+    { ...instance.props, children: '.foo { display: inline-flex; }' },
+  ];
 
   component.componentDidUpdate(instance, args);
 
@@ -95,7 +95,7 @@ test('if componentDidUpdate will set the new style in state if children have cha
 test('if componentWillUnmount will return the node', (t) => {
   const instance = {
     node: {},
-    returnNode: sinon.spy()
+    returnNode: sinon.spy(),
   };
 
   component.componentWillUnmount(instance);
@@ -108,8 +108,8 @@ test('if getStyleForState will build the style based on the props passed', (t) =
   const instance = {
     props: {
       children: '.foo { display: flex; }',
-      isCompressed: true
-    }
+      isCompressed: true,
+    },
   };
 
   const result = component.getStyleForState(instance);
@@ -118,8 +118,8 @@ test('if getStyleForState will build the style based on the props passed', (t) =
     style: styles.getRenderedStyles(instance.props.children, {
       isCompressed: options.getCoalescedOption(instance.props, 'isCompressed'),
       isMinified: options.getCoalescedOption(instance.props, 'isMinified'),
-      isPrefixed: options.getCoalescedOption(instance.props, 'isPrefixed')
-    })
+      isPrefixed: options.getCoalescedOption(instance.props, 'isPrefixed'),
+    }),
   });
 });
 
@@ -130,14 +130,14 @@ test.serial('if relocateNode will do nothing if there is no document', (t) => {
 
   const instance = {
     node: null,
-    originalParent: null
+    originalParent: null,
   };
   const args = [
     {
       parentNode: {
-        removeChild: sinon.spy()
-      }
-    }
+        removeChild: sinon.spy(),
+      },
+    },
   ];
 
   try {
@@ -156,7 +156,7 @@ test.serial('if relocateNode will do nothing if there is no node', (t) => {
 
   const instance = {
     node: null,
-    originalParent: null
+    originalParent: null,
   };
   const args = [null];
 
@@ -173,33 +173,36 @@ test.serial('if relocateNode will do nothing if there is no node', (t) => {
   }
 });
 
-test.serial('if relocateNode will move the node to the document head if document and node exist', (t) => {
-  const stub = sinon.stub(document.head, 'appendChild');
+test.serial(
+  'if relocateNode will move the node to the document head if document and node exist',
+  (t) => {
+    const stub = sinon.stub(document.head, 'appendChild');
 
-  const instance = {
-    node: null,
-    originalParent: null
-  };
-  const args = [
-    {
-      parentNode: {
-        removeChild: sinon.spy()
-      }
-    }
-  ];
+    const instance = {
+      node: null,
+      originalParent: null,
+    };
+    const args = [
+      {
+        parentNode: {
+          removeChild: sinon.spy(),
+        },
+      },
+    ];
 
-  component.relocateNode(instance, args);
+    component.relocateNode(instance, args);
 
-  t.is(instance.originalParent, args[0].parentNode);
+    t.is(instance.originalParent, args[0].parentNode);
 
-  t.true(args[0].parentNode.removeChild.calledOnce);
-  t.true(args[0].parentNode.removeChild.calledWith(args[0]));
+    t.true(args[0].parentNode.removeChild.calledOnce);
+    t.true(args[0].parentNode.removeChild.calledWith(args[0]));
 
-  t.true(stub.calledOnce);
-  t.true(stub.calledWith(args[0]));
+    t.true(stub.calledOnce);
+    t.true(stub.calledWith(args[0]));
 
-  stub.restore();
-});
+    stub.restore();
+  },
+);
 
 test.serial('if returnNode will do nothing if there is no document', (t) => {
   const doc = global.document;
@@ -209,8 +212,8 @@ test.serial('if returnNode will do nothing if there is no document', (t) => {
   const instance = {
     node: {},
     originalParent: {
-      appendChild: sinon.spy()
-    }
+      appendChild: sinon.spy(),
+    },
   };
   const args = [instance.node];
 
@@ -233,8 +236,8 @@ test.serial('if returnNode will do nothing if there is no node', (t) => {
   const instance = {
     node: {},
     originalParent: {
-      appendChild: sinon.spy()
-    }
+      appendChild: sinon.spy(),
+    },
   };
   const args = [null];
 
@@ -253,49 +256,38 @@ test.serial('if returnNode will do nothing if there is no node', (t) => {
   }
 });
 
-test.serial('if returnNode will move the node to the document head if document and node exist', (t) => {
-  const stub = sinon.stub(document.head, 'removeChild');
+test.serial(
+  'if returnNode will move the node to the document head if document and node exist',
+  (t) => {
+    const stub = sinon.stub(document.head, 'removeChild');
 
-  const originalParent = {
-    appendChild: sinon.spy()
-  };
+    const originalParent = {
+      appendChild: sinon.spy(),
+    };
 
-  const instance = {
-    node: {},
-    originalParent
-  };
-  const args = [instance.node];
+    const instance = {
+      node: {},
+      originalParent,
+    };
+    const args = [instance.node];
 
-  component.returnNode(instance, args);
+    component.returnNode(instance, args);
 
-  t.is(instance.originalParent, null);
+    t.is(instance.originalParent, null);
 
-  t.true(originalParent.appendChild.calledOnce);
-  t.true(originalParent.appendChild.calledWith(args[0]));
+    t.true(originalParent.appendChild.calledOnce);
+    t.true(originalParent.appendChild.calledWith(args[0]));
 
-  t.true(stub.calledOnce);
-  t.true(stub.calledWith(args[0]));
+    t.true(stub.calledOnce);
+    t.true(stub.calledWith(args[0]));
 
-  stub.restore();
-});
+    stub.restore();
+  },
+);
 
 test.serial('if Style will render correctly with default props', (t) => {
   const props = {
-    children: '.foo { display: flex; }'
-  };
-
-  const wrapper = shallow(<Style {...props} />);
-
-  t.snapshot(toJson(wrapper));
-
-  blob.getUrl.reset();
-  blob.hasBlobSupport.reset();
-});
-
-test.serial('if Style will render correctly with sourceMaps and additional props', (t) => {
-  const props = {
     children: '.foo { display: flex; }',
-    'data-foo': 'bar'
   };
 
   const wrapper = shallow(<Style {...props} />);
@@ -306,56 +298,82 @@ test.serial('if Style will render correctly with sourceMaps and additional props
   blob.hasBlobSupport.reset();
 });
 
-test.serial('if Style will render correctly with default props when blob support does not exist', (t) => {
-  const props = {
-    children: '.foo { display: flex; }'
-  };
+test.serial(
+  'if Style will render correctly with sourceMaps and additional props',
+  (t) => {
+    const props = {
+      children: '.foo { display: flex; }',
+      'data-foo': 'bar',
+    };
 
-  const existingBlob = window.Blob;
+    const wrapper = shallow(<Style {...props} />);
 
-  window.Blob = undefined;
+    t.snapshot(toJson(wrapper));
 
-  const stub = sinon.stub(console, 'error');
+    blob.getUrl.reset();
+    blob.hasBlobSupport.reset();
+  },
+);
 
-  const wrapper = shallow(<Style {...props} />);
+test.serial(
+  'if Style will render correctly with default props when blob support does not exist',
+  (t) => {
+    const props = {
+      children: '.foo { display: flex; }',
+    };
 
-  t.true(stub.calledOnce);
+    const existingBlob = window.Blob;
 
-  stub.restore();
+    window.Blob = undefined;
 
-  t.snapshot(toJson(wrapper));
+    const stub = sinon.stub(console, 'error');
 
-  blob.getUrl.reset();
-  blob.hasBlobSupport.reset();
+    const wrapper = shallow(<Style {...props} />);
 
-  window.blob = existingBlob;
-});
+    t.true(stub.calledOnce);
 
-test.serial('if Style will render correctly with no sourceMap requested', (t) => {
-  const props = {
-    children: '.foo { display: flex; }',
-    hasSourceMap: false
-  };
+    stub.restore();
 
-  const wrapper = shallow(<Style {...props} />);
+    t.snapshot(toJson(wrapper));
 
-  t.snapshot(toJson(wrapper));
+    blob.getUrl.reset();
+    blob.hasBlobSupport.reset();
 
-  blob.getUrl.reset();
-  blob.hasBlobSupport.reset();
-});
+    window.blob = existingBlob;
+  },
+);
 
-test.serial('if Style will render correctly with no sourceMap requested and additional props', (t) => {
-  const props = {
-    children: '.foo { display: flex; }',
-    'data-foo': 'bar',
-    hasSourceMap: false
-  };
+test.serial(
+  'if Style will render correctly with no sourceMap requested',
+  (t) => {
+    const props = {
+      children: '.foo { display: flex; }',
+      hasSourceMap: false,
+    };
 
-  const wrapper = shallow(<Style {...props} />);
+    const wrapper = shallow(<Style {...props} />);
 
-  t.snapshot(toJson(wrapper));
+    t.snapshot(toJson(wrapper));
 
-  blob.getUrl.reset();
-  blob.hasBlobSupport.reset();
-});
+    blob.getUrl.reset();
+    blob.hasBlobSupport.reset();
+  },
+);
+
+test.serial(
+  'if Style will render correctly with no sourceMap requested and additional props',
+  (t) => {
+    const props = {
+      children: '.foo { display: flex; }',
+      'data-foo': 'bar',
+      hasSourceMap: false,
+    };
+
+    const wrapper = shallow(<Style {...props} />);
+
+    t.snapshot(toJson(wrapper));
+
+    blob.getUrl.reset();
+    blob.hasBlobSupport.reset();
+  },
+);

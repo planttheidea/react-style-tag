@@ -7,7 +7,7 @@ import {createElementRef, createMethod} from 'react-parm';
 import {createGetCachedLinkHref, hasBlobSupport} from './blob';
 
 // constants
-import {SUPPORTS_BEFORE_UPDATE_SNAPSHOT} from './constants';
+import {HAS_UNSAFE_METHODS} from './constants';
 
 // options
 import {getCoalescedOption, setGlobalOptions} from './options';
@@ -29,7 +29,7 @@ import {getRenderedStyles} from './styles';
 export const componentDidMount = ({node, relocateNode}) => relocateNode(node);
 
 /**
- * @function getSnapshotBeforeUpdate
+ * @function componentWillUpdate
  *
  * @description
  * before the update occurs, if the sourceMap requirements have changed, return the node to its original position
@@ -37,12 +37,9 @@ export const componentDidMount = ({node, relocateNode}) => relocateNode(node);
  * @param {ReactComponent} instance the component instance
  * @param {HTMLElement} instance.node the node to render the styles into
  * @param {function} instance.returnNode the method to return the node to its original parent
- * @returns {null}
  */
-export const getSnapshotBeforeUpdate = ({node, returnNode}) => {
+export const componentWillUpdate = ({node, returnNode}) => {
   returnNode(node);
-
-  return null;
 };
 
 /**
@@ -61,7 +58,10 @@ export const getSnapshotBeforeUpdate = ({node, returnNode}) => {
  * @param {Array<any>} args the arguments passed to the function
  * @param {Object} previousProps the previous props of the component
  */
-export const componentDidUpdate = ({getStyleForState, node, relocateNode, props, setState}, [previousProps]) => {
+export const componentDidUpdate = (
+  {getStyleForState, node, relocateNode, props, setState},
+  [previousProps],
+) => {
   relocateNode(node);
 
   if (props.children !== previousProps.children) {
@@ -143,6 +143,10 @@ export const returnNode = (instance, [node]) => {
   }
 };
 
+const willUpdateMethod = HAS_UNSAFE_METHODS
+  ? 'UNSAFE_componentWillUpdate'
+  : 'componentWillUpdate';
+
 class Style extends PureComponent {
   static propTypes = {
     children: PropTypes.string.isRequired,
@@ -162,12 +166,8 @@ class Style extends PureComponent {
   // lifecycle methods
   componentDidMount = createMethod(this, componentDidMount);
   componentDidUpdate = createMethod(this, componentDidUpdate);
-  /* eslint-disable react/sort-comp */
-  [SUPPORTS_BEFORE_UPDATE_SNAPSHOT ? 'getSnapshotBeforeUpdate' : 'componentWillUpdate'] = createMethod(
-    this,
-    getSnapshotBeforeUpdate
-  );
-  /* eslint-enable */
+  // eslint-disable-next-line react/sort-comp
+  [willUpdateMethod] = createMethod(this, componentWillUpdate);
   componentWillUnmount = createMethod(this, componentWillUnmount);
 
   // instance values
@@ -210,7 +210,7 @@ class Style extends PureComponent {
 
       /* eslint-disable no-console */
       console.error(
-        'To support sourcemaps for react-style-tag you need Blob support, and the browser you are using does not currently support it. You should include a polyfill prior to the rendering of this component.'
+        'To support sourcemaps for react-style-tag you need Blob support, and the browser you are using does not currently support it. You should include a polyfill prior to the rendering of this component.',
       );
       /* eslint-enable */
     }
