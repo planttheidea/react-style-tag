@@ -2,7 +2,7 @@
 import test from 'ava';
 import React from 'react';
 import sinon from 'sinon';
-import { shallow } from 'enzyme';
+import {shallow} from 'enzyme';
 import toJson from 'enzyme-to-json';
 
 // src
@@ -15,14 +15,14 @@ const Style = component.default;
 
 function setDocument(value) {
   Object.defineProperty(global, 'document', {
-    value,
+    value
   });
 }
 
 test('if componentDidMount will call relocateNode with the node', (t) => {
   const instance = {
     node: {},
-    relocateNode: sinon.spy(),
+    relocateNode: sinon.spy()
   };
 
   component.componentDidMount(instance);
@@ -35,11 +35,11 @@ test('if componentWillUpdate will call returnNode', (t) => {
   const instance = {
     node: {},
     props: {
-      hasSourceMap: true,
+      hasSourceMap: true
     },
-    returnNode: sinon.spy(),
+    returnNode: sinon.spy()
   };
-  const args = [{ ...instance.props }];
+  const args = [{...instance.props}];
 
   component.componentWillUpdate(instance, args);
 
@@ -53,12 +53,12 @@ test('if componentDidUpdate will relocate the node even if nothing has changed',
     node: {},
     props: {
       children: '.foo { display: flex; }',
-      hasSourceMap: true,
+      hasSourceMap: true
     },
     relocateNode: sinon.spy(),
-    setState: sinon.spy(),
+    setState: sinon.spy()
   };
-  const args = [{ ...instance.props }];
+  const args = [{...instance.props}];
 
   component.componentDidUpdate(instance, args);
 
@@ -74,13 +74,13 @@ test('if componentDidUpdate will set the new style in state if children have cha
     node: {},
     props: {
       children: '.foo { display: flex; }',
-      hasSourceMap: true,
+      hasSourceMap: true
     },
     relocateNode: sinon.spy(),
-    setState: sinon.spy(),
+    setState: sinon.spy()
   };
   const args = [
-    { ...instance.props, children: '.foo { display: inline-flex; }' },
+    {...instance.props, children: '.foo { display: inline-flex; }'}
   ];
 
   component.componentDidUpdate(instance, args);
@@ -95,7 +95,7 @@ test('if componentDidUpdate will set the new style in state if children have cha
 test('if componentWillUnmount will return the node', (t) => {
   const instance = {
     node: {},
-    returnNode: sinon.spy(),
+    returnNode: sinon.spy()
   };
 
   component.componentWillUnmount(instance);
@@ -108,8 +108,8 @@ test('if getStyleForState will build the style based on the props passed', (t) =
   const instance = {
     props: {
       children: '.foo { display: flex; }',
-      isCompressed: true,
-    },
+      isCompressed: true
+    }
   };
 
   const result = component.getStyleForState(instance);
@@ -118,8 +118,8 @@ test('if getStyleForState will build the style based on the props passed', (t) =
     style: styles.getRenderedStyles(instance.props.children, {
       isCompressed: options.getCoalescedOption(instance.props, 'isCompressed'),
       isMinified: options.getCoalescedOption(instance.props, 'isMinified'),
-      isPrefixed: options.getCoalescedOption(instance.props, 'isPrefixed'),
-    }),
+      isPrefixed: options.getCoalescedOption(instance.props, 'isPrefixed')
+    })
   });
 });
 
@@ -130,14 +130,14 @@ test.serial('if relocateNode will do nothing if there is no document', (t) => {
 
   const instance = {
     node: null,
-    originalParent: null,
+    originalParent: null
   };
   const args = [
     {
       parentNode: {
-        removeChild: sinon.spy(),
-      },
-    },
+        removeChild: sinon.spy()
+      }
+    }
   ];
 
   try {
@@ -156,7 +156,7 @@ test.serial('if relocateNode will do nothing if there is no node', (t) => {
 
   const instance = {
     node: null,
-    originalParent: null,
+    originalParent: null
   };
   const args = [null];
 
@@ -180,14 +180,14 @@ test.serial(
 
     const instance = {
       node: null,
-      originalParent: null,
+      originalParent: null
     };
     const args = [
       {
         parentNode: {
-          removeChild: sinon.spy(),
-        },
-      },
+          removeChild: sinon.spy()
+        }
+      }
     ];
 
     component.relocateNode(instance, args);
@@ -212,8 +212,8 @@ test.serial('if returnNode will do nothing if there is no document', (t) => {
   const instance = {
     node: {},
     originalParent: {
-      appendChild: sinon.spy(),
-    },
+      appendChild: sinon.spy()
+    }
   };
   const args = [instance.node];
 
@@ -236,8 +236,8 @@ test.serial('if returnNode will do nothing if there is no node', (t) => {
   const instance = {
     node: {},
     originalParent: {
-      appendChild: sinon.spy(),
-    },
+      appendChild: sinon.spy()
+    }
   };
   const args = [null];
 
@@ -262,12 +262,12 @@ test.serial(
     const stub = sinon.stub(document.head, 'removeChild');
 
     const originalParent = {
-      appendChild: sinon.spy(),
+      appendChild: sinon.spy()
     };
 
     const instance = {
       node: {},
-      originalParent,
+      originalParent
     };
     const args = [instance.node];
 
@@ -287,7 +287,7 @@ test.serial(
 
 test.serial('if Style will render correctly with default props', (t) => {
   const props = {
-    children: '.foo { display: flex; }',
+    children: '.foo { display: flex; }'
   };
 
   const wrapper = shallow(<Style {...props} />);
@@ -303,7 +303,7 @@ test.serial(
   (t) => {
     const props = {
       children: '.foo { display: flex; }',
-      'data-foo': 'bar',
+      'data-foo': 'bar'
     };
 
     const wrapper = shallow(<Style {...props} />);
@@ -319,7 +319,7 @@ test.serial(
   'if Style will render correctly with default props when blob support does not exist',
   (t) => {
     const props = {
-      children: '.foo { display: flex; }',
+      children: '.foo { display: flex; }'
     };
 
     const existingBlob = window.Blob;
@@ -348,7 +348,7 @@ test.serial(
   (t) => {
     const props = {
       children: '.foo { display: flex; }',
-      hasSourceMap: false,
+      hasSourceMap: false
     };
 
     const wrapper = shallow(<Style {...props} />);
@@ -366,7 +366,7 @@ test.serial(
     const props = {
       children: '.foo { display: flex; }',
       'data-foo': 'bar',
-      hasSourceMap: false,
+      hasSourceMap: false
     };
 
     const wrapper = shallow(<Style {...props} />);
