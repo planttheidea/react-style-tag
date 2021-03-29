@@ -2,7 +2,7 @@
 import test from 'ava';
 import React from 'react';
 import sinon from 'sinon';
-import {shallow} from 'enzyme';
+import {mount, shallow} from 'enzyme';
 import toJson from 'enzyme-to-json';
 
 // src
@@ -377,3 +377,10 @@ test.serial(
     blob.hasBlobSupport.reset();
   },
 );
+
+test.serial('if Style will have the correct will update method', (t) => {
+  const wrapper = mount(<Style>{'.foo { display: flex }'}</Style>);
+  const instance = wrapper.instance();
+
+  t.is(typeof instance.UNSAFE_componentWillUpdate, 'function');
+});

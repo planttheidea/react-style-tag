@@ -93,7 +93,7 @@ export const componentWillUnmount = ({node, returnNode}) => returnNode(node);
  * @returns {{style: string}} the style strng to use in the rendered tag
  */
 export const getStyleForState = ({props}) => ({
-  style: getRenderedStyles(props.children, {
+  style: getRenderedStyles(props.children || '', {
     isCompressed: getCoalescedOption(props, 'isCompressed'),
     isMinified: getCoalescedOption(props, 'isMinified'),
     isPrefixed: getCoalescedOption(props, 'isPrefixed')
