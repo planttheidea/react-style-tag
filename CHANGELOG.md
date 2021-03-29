@@ -1,5 +1,9 @@
 # react-style-tag CHANGELOG
 
+## 2.0.3
+
+- [#30](https://github.com/planttheidea/react-style-tag/issues/30) - Another fix for deprecated lifecycle methods (moving to normal prefixed version instead of `getSnapshotBeforeUpdate`)
+
 ## 2.0.2
 
 - [#26](https://github.com/planttheidea/react-style-tag/pull/26) - Fix React version check for deprecated lifecycle methods
