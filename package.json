@@ -25,6 +25,7 @@
   },
   "description": "Write scoped, autoprefixed styles declaratively in React",
   "devDependencies": {
+    "@wojtekmaj/enzyme-adapter-react-17": "^0.6.3",
     "ava": "^0.25.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
@@ -39,7 +40,6 @@
     "blob-polyfill": "^2.0.20171115",
     "browser-env": "^3.2.5",
     "enzyme": "^3.3.0",
-    "enzyme-adapter-react-16": "^1.1.1",
     "enzyme-to-json": "^3.3.3",
     "eslint": "^4.19.1",
     "eslint-config-rapid7": "^2.11.1",
