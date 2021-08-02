@@ -26,4 +26,5 @@ const [REACT_MAJOR_VERSION, REACT_MINOR_VERSION] = React.version
  * @constant {boolean} HAS_UNSAFE_METHODS have lifecycle methods been prefixed with `UNSAFE_` in the React version
  */
 export const HAS_UNSAFE_METHODS =
-  REACT_MAJOR_VERSION >= 16 && REACT_MINOR_VERSION >= 3;
+  REACT_MAJOR_VERSION > 16 ||
+  (REACT_MAJOR_VERSION === 16 && REACT_MINOR_VERSION >= 3);
