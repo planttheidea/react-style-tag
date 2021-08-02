@@ -19,8 +19,8 @@ module.exports = Object.assign({}, defaultConfig, {
       colors: true,
       hash: false,
       timings: true,
-      version: false
-    }
+      version: false,
+    },
   },
 
   entry: [path.resolve(ROOT, 'DEV_ONLY', 'index.js')],
@@ -32,21 +32,22 @@ module.exports = Object.assign({}, defaultConfig, {
       if (rule.loader === 'eslint-loader') {
         return Object.assign({}, rule, {
           options: Object.assign({}, rule.options, {
-            emitError: undefined,
-            failOnWarning: false
-          })
+            emitError: false,
+            failOnError: false,
+            failOnWarning: false,
+          }),
         });
       }
 
       if (rule.loader === 'babel-loader') {
         return Object.assign({}, rule, {
-          include: rule.include.concat([path.resolve(ROOT, 'DEV_ONLY')])
+          include: rule.include.concat([path.resolve(ROOT, 'DEV_ONLY')]),
         });
       }
 
       return rule;
-    })
+    }),
   }),
 
-  plugins: [...defaultConfig.plugins, new HtmlWebpackPlugin()]
+  plugins: [...defaultConfig.plugins, new HtmlWebpackPlugin()],
 });

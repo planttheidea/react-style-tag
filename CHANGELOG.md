@@ -1,5 +1,9 @@
 # react-style-tag CHANGELOG
 
+## 2.0.4
+
+- [#38](https://github.com/planttheidea/react-style-tag/issues/38) - Another _another_ fix for deprecated lifecycle methods, this time due to a lack of React 17 support
+
 ## 2.0.3
 
 - [#30](https://github.com/planttheidea/react-style-tag/issues/30) - Another fix for deprecated lifecycle methods (moving to normal prefixed version instead of `getSnapshotBeforeUpdate`)

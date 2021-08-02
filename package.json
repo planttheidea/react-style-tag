@@ -25,6 +25,7 @@
   },
   "description": "Write scoped, autoprefixed styles declaratively in React",
   "devDependencies": {
+    "@wojtekmaj/enzyme-adapter-react-17": "^0.6.3",
     "ava": "^0.25.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
@@ -39,7 +40,6 @@
     "blob-polyfill": "^2.0.20171115",
     "browser-env": "^3.2.5",
     "enzyme": "^3.3.0",
-    "enzyme-adapter-react-16": "^1.1.1",
     "enzyme-to-json": "^3.3.3",
     "eslint": "^4.19.1",
     "eslint-config-rapid7": "^2.11.1",
@@ -50,9 +50,9 @@
     "json-loader": "0.5.7",
     "nyc": "^11.6.0",
     "prop-types": "^15.6.1",
-    "react": "^16.3.1",
-    "react-dom": "^16.3.1",
-    "react-test-renderer": "^16.3.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-test-renderer": "^17.0.2",
     "rollup": "^0.57.1",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-commonjs": "^9.1.0",
@@ -77,7 +77,7 @@
   "name": "react-style-tag",
   "peerDependencies": {
     "prop-types": "^15.6.1",
-    "react": "^15.3.0 || ^16.0.0",
+    "react": "^15.3.0 || ^16.0.0 || ^17.0.0",
     "react-dom": "^15.3.0 || ^16.0.0 || ^17.0.0"
   },
   "repository": {
@@ -103,5 +103,5 @@
     "transpile:lib": "npm run clean:lib && BABEL_ENV=lib babel src --out-dir lib",
     "transpile:es": "npm run clean:es && BABEL_ENV=es babel src --out-dir es"
   },
-  "version": "2.0.3"
+  "version": "2.0.4"
 }
