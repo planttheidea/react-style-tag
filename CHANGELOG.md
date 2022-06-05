@@ -1,5 +1,9 @@
 # react-style-tag CHANGELOG
 
+## 2.0.5
+
+- [#34](https://github.com/planttheidea/react-style-tag/issues/34) - `process` is not defined for some build environments
+
 ## 2.0.4
 
 - [#38](https://github.com/planttheidea/react-style-tag/issues/38) - Another _another_ fix for deprecated lifecycle methods, this time due to a lack of React 17 support
