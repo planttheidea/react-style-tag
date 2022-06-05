@@ -12,6 +12,7 @@ export const BEAUTIFY_OPTIONS = {
  * @constant {boolean} IS_PRODUCTION is the runtime in the production environment
  */
 export const IS_PRODUCTION = !!(
+  typeof process !== 'undefined' &&
   process &&
   process.env &&
   process.env.NODE_ENV === 'production'
