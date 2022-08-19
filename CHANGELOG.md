@@ -1,5 +1,22 @@
 # react-style-tag CHANGELOG
 
+## 3.0.0
+
+**Breaking Changes**
+
+- Versions of React prior to `16.8.0` (aka, when hooks were introduced) are no longer supported
+- Specific ES2015 features are now expected
+  - `String.prototype.trimEnd()`
+  - `Object.assign()`
+- `Style` no longer has the static `setGlobalOptions` method applied (use the dedicated import)
+- `isCompressed` has been deprecated, as it is no longer supported by `stylis`
+
+**Enhancements**
+
+- Rewritten in TypeScript with exposed types, as requested in [#49](https://github.com/planttheidea/react-style-tag/issues/49)
+- Updated to support React 18, as requested in [#53](https://github.com/planttheidea/react-style-tag/issues/53)
+- Updated `stylis` to latest version, which has significantly better performance
+
 ## 2.0.5
 
 - [#34](https://github.com/planttheidea/react-style-tag/issues/34) - `process` is not defined for some build environments

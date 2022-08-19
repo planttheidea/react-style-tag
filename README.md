@@ -4,18 +4,19 @@ Write styles declaratively in React
 
 ## Table of contents
 
-* [Installation](#installation)
-* [Usage](#usage)
-* [Implementation](#implementation)
-* [Summary](#summary)
-* [Scoped Styles](#scoped-styles)
-* [Props](#props)
-  * [hasSourceMap](#hassourcemap)
-  * [isCompressed](#iscompressed)
-  * [isMinified](#isminified)
-  * [isPrefixed](#isprefixed)
-* [Global Options](#global-options)
-* [Development](#development)
+- [react-style-tag](#react-style-tag)
+  - [Table of contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Implementation](#implementation)
+  - [Summary](#summary)
+  - [Scoped Styles](#scoped-styles)
+  - [Props](#props)
+      - [hasSourceMap](#hassourcemap)
+      - [isMinified](#isminified)
+      - [isPrefixed](#isprefixed)
+  - [Global Options](#global-options)
+  - [Development](#development)
 
 ## Installation
 
@@ -27,28 +28,25 @@ $ npm i react-style-tag --save
 
 ```javascript
 // ES2015
-import { Style } from "react-style-tag";
+import { Style } from 'react-style-tag';
 
 // CommonJS
-const Style = require("react-style-tag").Style;
+const Style = require('react-style-tag').Style;
 ```
 
 ## Implementation
 
 ```javascript
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
-import { Style } from "react-style-tag";
+import { Style } from 'react-style-tag';
 
-class App extends Component {
-  render() [
-    return (
-      <div>
-        <h1 className="foo">
-          Bar
-        </h1>
+function App() {
+  return (
+    <div>
+      <h1 className="foo">Bar</h1>
 
-        <Style>{`
+      <Style>{`
           .foo {
             color: red;
 
@@ -61,9 +59,8 @@ class App extends Component {
             }
           }
         `}</Style>
-      </div>
-    );
-  }
+    </div>
+  );
 }
 ```
 
@@ -78,27 +75,22 @@ The style tag that is injected into the head will be automatically mounted whene
 There is an additional utility provided that can help to scope your styles in the vein of [CSS Modules](https://github.com/css-modules/css-modules), and this is `hashKeys`. This function accepts an array of keys to hash, and returns a map of the keys to their hashed values.
 
 ```javascript
-import { hashKeys, Style } from "react-style-tag";
+import { hashKeys, Style } from 'react-style-tag';
 
-const { foo, bar } = hashKeys(["foo", "bar"]);
+const { foo, bar } = hashKeys(['foo', 'bar']);
 
-class App extends Component {
-  render() {
-    return (
-      <div>
-        <div className={foo}>
-          My text is red due to the scoped style of foo.
-        </div>
+function App() {
+  return (
+    <div>
+      <div className={foo}>My text is red due to the scoped style of foo.</div>
 
-        <div className={bar}>
-          My text is green due to the scoped style of bar.
-        </div>
+      <div className={bar}>
+        My text is green due to the scoped style of bar.
+      </div>
 
-        <div className="baz">
-          My text is blue due to the global style of baz.
-        </div>
+      <div className="baz">My text is blue due to the global style of baz.</div>
 
-        <Style>{`
+      <Style>{`
           .${foo} {
             color: red;
           }
@@ -111,9 +103,8 @@ class App extends Component {
             color: blue;
           }
         `}</Style>
-      </div>
-    );
-  }
+    </div>
+  );
 }
 ```
 
@@ -127,17 +118,11 @@ Naturally you can pass all standard attributes (`id`, `name`, etc.) and they wil
 
 _boolean, defaults to false in production, true otherwise_
 
-If set to `true`, it will render a `<link>` tag instead of a `<style>` tag, which allows easy source referencing in browser DevTools. This is similar to the way that webpack handles its `style-loader`.
+If set to `true`, it will render a `<link>` tag instead of a `<style>` tag, which allows source referencing in browser DevTools. This is similar to the way that webpack handles styles via its `style-loader`.
 
 The use of sourcemaps require the use of `Blob`, which is supported in IE10+, Safari 6.1+, and all other modern browsers (Chrome, Firefox, etc.). If you browser does not support `Blob` and you want to use sourcemaps, you should include a polyfill. Recommended is [`blob-polyfill`](https://www.npmjs.com/package/blob-polyfill).
 
 Make sure this import occurs prior to the import of `react-style-tag` to ensure blob support is present.
-
-#### isCompressed
-
-_boolean, defaults to true_
-
-If set to `false`, it will prevent aggressive compression of the CSS.
 
 #### isMinified
 
@@ -156,26 +141,13 @@ If set to `false`, it will prevent `stylis` from applying vendor prefixes to the
 All of the props available are also available as global options for all instances that can be set with the `setGlobalOptions` method:
 
 ```javascript
-import { setGlobalOptions } from "react-style-tag";
+import { setGlobalOptions } from 'react-style-tag';
 
 setGlobalOptions({
   isCompressed: false,
   hasSourceMap: true,
   isMinified: true,
-  isPrefixed: false
-});
-```
-
-The `setGlobalOptions` method is also available as a static method on the `Style` component:
-
-```javascript
-import { Style } from "react-style-tag";
-
-Style.setGlobalOptions({
-  isCompressed: false,
-  hasSourceMap: true,
-  isMinified: true,
-  isPrefixed: false
+  isPrefixed: false,
 });
 ```
 
@@ -183,16 +155,16 @@ Style.setGlobalOptions({
 
 Standard stuff, clone the repo and `npm i` to get the dependencies. npm scripts available:
 
-* `build` => run rollup to build `dist` files with NODE_ENV=production
-* `dev` => run webpack dev server to run example app / playground
-* `dist` => runs `build` and `build:minified`
-* `lint` => run ESLint against all files in the `src` folder
-* `lint:fix` => runs `lint` with `--fix`
-* `prepublish` => runs `prepublish:compile` when publishing
-* `prepublish:compile` => run `lint`, `test:coverage`, `transpile:es`, `transpile:lib`, `dist`
-* `test` => run AVA test functions with `NODE_ENV=test`
-* `test:coverage` => run `test` but with `nyc` for coverage checker
-* `test:watch` => run `test`, but with persistent watcher
-* `transpile:lib` => run babel against all files in `src` to create files in `lib`
-* `transpile:es` => run babel against all files in `src` to create files in `es`, preserving ES2015 modules (for
+- `build` => run rollup to build `dist` files
+- `dev` => run webpack dev server to run example app / playground
+- `dist` => runs `build` and `build:minified`
+- `lint` => run ESLint against all files in the `src` folder
+- `lint:fix` => runs `lint` with `--fix`
+- `prepublishOnly` => run `lint`, `typecheck`, `clean`, `test`, `transpile:es`, `transpile:lib`, and `dist`
+- `test` => run `jest` test functions with `NODE_ENV=test`
+- `test:coverage` => run `test`, but with coverage checker
+- `test:watch` => run `test`, but with persistent watcher
+- `transpile:lib` => run babel against all files in `src` to create files in `lib`
+- `transpile:es` => run babel against all files in `src` to create files in `es`, preserving ES2015 modules (for
   [`pkg.module`](https://github.com/rollup/rollup/wiki/pkg.module))
+- `typecheck` => check for TypeScript errors
