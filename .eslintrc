@@ -10,6 +10,7 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended"
   ],
+  "ignorePatterns": ["**/dist/**"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2022,
