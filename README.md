@@ -144,7 +144,6 @@ All of the props available are also available as global options for all instance
 import { setGlobalOptions } from 'react-style-tag';
 
 setGlobalOptions({
-  isCompressed: false,
   hasSourceMap: true,
   isMinified: true,
   isPrefixed: false,
