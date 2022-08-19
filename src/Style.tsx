@@ -9,14 +9,13 @@ export interface Props {
   children: string;
   hasSourceMap?: boolean;
   id?: string;
-  isCompressed?: boolean;
   isMinified?: boolean;
   isPrefixed?: boolean;
 }
 
 type PassedProps = Omit<
   Props,
-  'children' | 'hasSourceMap' | 'isCompressed' | 'isMinified' | 'isPrefixed'
+  'children' | 'hasSourceMap' | 'isMinified' | 'isPrefixed'
 >;
 
 /**
@@ -27,7 +26,6 @@ function usePassedProps(props: Props): PassedProps {
   const {
     children: _children,
     hasSourceMap: _hasSourceMap,
-    isCompressed: _isCompressed,
     isMinified: _isMinified,
     isPrefixed: _isPrefixed,
     ...remainingProps

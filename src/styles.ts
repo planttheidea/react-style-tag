@@ -1,4 +1,4 @@
-import Stylis from 'stylis';
+import { compile, serialize, stringify, middleware, prefixer } from 'stylis';
 import { BEAUTIFY_OPTIONS } from './constants';
 import { getCoalescedOption } from './options';
 
@@ -483,12 +483,12 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
  * Get the styles processed for passing through to the element.
  */
 export function getProcessedStyles(style: string, props: Props): string {
-  return new Stylis({
-    compress: getCoalescedOption(props, 'isCompressed'),
-    global: false,
-    keyframe: false,
-    prefix: getCoalescedOption(props, 'isPrefixed'),
-  })('', style);
+  const isPrefixed = getCoalescedOption(props, 'isPrefixed');
+
+  const compiled = compile(style);
+  const enhancer = isPrefixed ? middleware([prefixer, stringify]) : stringify;
+
+  return serialize(compiled, enhancer);
 }
 
 /**

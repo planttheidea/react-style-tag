@@ -77,6 +77,7 @@ function ToggledDiv({ color, id }: DivProps) {
 }
 
 export default function App() {
+  const [minified, setMinified] = useState(false);
   const [sourceMap, hasSourceMap] = useState(false);
   const [toggled, setToggled] = useState(false);
   const [visible, setVisible] = useState(true);
@@ -94,7 +95,8 @@ export default function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      hasSourceMap((sourceMapp) => !sourceMap);
+      setMinified((minified) => !minified);
+      // hasSourceMap((sourceMap) => !sourceMap);
     }, 5000);
 
     return () => clearInterval(interval);
@@ -135,10 +137,7 @@ export default function App() {
       )}
 
       {visible && (
-        <Style
-          hasSourceMap={sourceMap}
-          // isMinified
-        >
+        <Style hasSourceMap={sourceMap} isMinified={minified}>
           {`
         @keyframes test {
           0% {
