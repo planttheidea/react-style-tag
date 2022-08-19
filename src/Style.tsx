@@ -1,4 +1,10 @@
-import React, { forwardRef, useMemo, useRef } from 'react';
+import {
+  createElement,
+  forwardRef,
+  MutableRefObject,
+  useMemo,
+  useRef,
+} from 'react';
 import { createGetCachedLinkHref } from './blob';
 import { getCoalescedOption } from './options';
 import { getRenderedStyles } from './styles';
@@ -18,18 +24,25 @@ type PassedProps = Omit<
   'children' | 'hasSourceMap' | 'isMinified' | 'isPrefixed'
 >;
 
+const INTERNAL_PROPS: Record<string, true> = {
+  children: true,
+  hasSourceMap: true,
+  isMinified: true,
+  isPrefixed: true,
+};
+
 /**
  * Extract the props used for deriving processed style for passing through to the
  * underlying HTML element.
  */
 function usePassedProps(props: Props): PassedProps {
-  const {
-    children: _children,
-    hasSourceMap: _hasSourceMap,
-    isMinified: _isMinified,
-    isPrefixed: _isPrefixed,
-    ...remainingProps
-  } = props;
+  const remainingProps: PassedProps = {};
+
+  for (const key in props) {
+    if (!INTERNAL_PROPS[key]) {
+      remainingProps[key] = props[key];
+    }
+  }
 
   return remainingProps;
 }
@@ -51,45 +64,42 @@ function useStyle(props: Props) {
   return styleRef.current;
 }
 
-const LinkTag = forwardRef<HTMLLinkElement, Props>(function LinkTag(
-  props,
-  ref
-) {
-  const passedProps = usePassedProps(props);
+const Link = forwardRef<
+  HTMLLinkElement,
+  { passedProps: PassedProps; style: string }
+>(function LinkTag({ passedProps, style }, ref) {
   const getCachedLinkHref = useMemo(createGetCachedLinkHref, []);
-  const style = useStyle(props);
 
-  return (
-    <link
-      {...passedProps}
-      href={getCachedLinkHref(style)}
-      rel="stylesheet"
-      ref={ref}
-    />
-  );
-});
-
-const StyleTag = forwardRef<HTMLStyleElement, Props>(function StyleTag(
-  props,
-  ref
-) {
-  const passedProps = usePassedProps(props);
-  const style = useStyle(props);
-
-  return (
-    <style {...passedProps} ref={ref}>
-      {style}
-    </style>
+  return createElement(
+    'link',
+    Object.assign(
+      {},
+      {
+        href: getCachedLinkHref(style),
+        rel: 'stylesheet',
+        ref,
+      }
+    )
   );
 });
 
 export const Style = forwardRef<HTMLLinkElement | HTMLStyleElement, Props>(
   function Style(props, ref) {
-    const Element = getCoalescedOption(props, 'hasSourceMap')
-      ? LinkTag
-      : StyleTag;
+    const passedProps = usePassedProps(props);
+    const style = useStyle(props);
 
-    // @ts-expect-error - `link` vs `style` has different `ref` setups.
-    return <Element {...props} ref={ref} />;
+    if (getCoalescedOption(props, 'hasSourceMap')) {
+      return createElement(Link, {
+        passedProps,
+        ref: ref as MutableRefObject<HTMLLinkElement>,
+        style,
+      });
+    }
+
+    return createElement(
+      'style',
+      Object.assign({}, passedProps, { ref }),
+      style
+    );
   }
 );

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { setGlobalOptions, hashKeys, Style } from '../src';
 
 interface DivProps {
@@ -93,6 +93,8 @@ export default function App() {
     []
   );
 
+  const ref = useRef<HTMLLinkElement | HTMLStyleElement>(null);
+
   useEffect(() => {
     const interval = setInterval(() => {
       setMinified((minified) => !minified);
@@ -137,7 +139,7 @@ export default function App() {
       )}
 
       {visible && (
-        <Style hasSourceMap={sourceMap} isMinified={minified}>
+        <Style hasSourceMap={sourceMap} isMinified={minified} ref={ref}>
           {`
         @keyframes test {
           0% {
