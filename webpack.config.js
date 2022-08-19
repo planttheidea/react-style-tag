@@ -16,7 +16,7 @@ module.exports = {
       {
         include: [path.resolve(ROOT, 'src'), path.resolve(ROOT, 'DEV_ONLY')],
         loader: 'babel-loader',
-        test: /\.js$/,
+        test: /\.(js|ts|tsx)$/,
       },
     ],
   },
@@ -33,4 +33,8 @@ module.exports = {
     new webpack.EnvironmentPlugin(['NODE_ENV']),
     new HtmlWebpackPlugin(),
   ],
+
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+  },
 };
