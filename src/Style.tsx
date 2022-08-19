@@ -3,7 +3,7 @@ import { createGetCachedLinkHref } from './blob';
 import { normalizeOptions } from './options';
 import { getRenderedStyles } from './styles';
 
-import type { MutableRefObject } from 'react';
+import type { ComponentType, MutableRefObject } from 'react';
 import type { Options } from './options';
 
 export interface Props {
@@ -11,15 +11,14 @@ export interface Props {
 
   children: string;
   hasSourceMap?: boolean;
-  id?: string;
   isMinified?: boolean;
   isPrefixed?: boolean;
 }
 
 type PassedProps = Omit<
-    Props,
-    'children' | 'hasSourceMap' | 'isMinified' | 'isPrefixed'
-  >
+  Props,
+  'children' | 'hasSourceMap' | 'isMinified' | 'isPrefixed'
+>;
 
 const INTERNAL_PROPS: Record<string, true> = {
   children: true,
@@ -108,4 +107,4 @@ export const Style = forwardRef<HTMLLinkElement | HTMLStyleElement, Props>(
       style
     );
   }
-);
+) as ComponentType<Props>;
