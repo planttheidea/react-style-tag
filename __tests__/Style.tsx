@@ -4,12 +4,25 @@ import React from 'react';
 import { Style } from '../src/Style';
 import { DEFAULT_OPTIONS, setGlobalOptions } from '../src/options';
 
-let counter = 0;
+import type { ReactNode } from 'react';
+
+function Wrapper({ children }: { children: ReactNode }) {
+  return <div data-testid="test">{children}</div>;
+}
+
+function getRenderedStyleTag(jsx: JSX.Element) {
+  const { getByTestId } = render(jsx, {
+    wrapper: Wrapper,
+  });
+
+  const container = getByTestId('test');
+
+  return Array.from(container.children)[0]!;
+}
 
 describe('Style', () => {
   afterEach(() => {
     setGlobalOptions({ ...DEFAULT_OPTIONS, hasSourceMap: false });
-    counter++;
   });
 
   describe('global options', () => {
@@ -18,9 +31,7 @@ describe('Style', () => {
         setGlobalOptions({ hasSourceMap: true });
 
         const style = '.foo { display: flex; }';
-        render(<Style>{style}</Style>);
-
-        const styleTag = screen.getByTitle(`ReactStyleTag-${counter}`);
+        const styleTag = getRenderedStyleTag(<Style>{style}</Style>);
 
         expect(styleTag.nodeName).toBe('LINK');
         expect(styleTag.getAttribute('rel')).toBe('stylesheet');
@@ -31,9 +42,7 @@ describe('Style', () => {
         setGlobalOptions({ hasSourceMap: false });
 
         const style = '.foo { display: flex; }';
-        render(<Style>{style}</Style>);
-
-        const styleTag = screen.getByTitle(`ReactStyleTag-${counter}`);
+        const styleTag = getRenderedStyleTag(<Style>{style}</Style>);
 
         expect(styleTag.nodeName).toBe('STYLE');
         expect(styleTag).toHaveTextContent(
@@ -47,9 +56,7 @@ describe('Style', () => {
         setGlobalOptions({ isMinified: true });
 
         const style = '.foo { display: flex; }';
-        render(<Style>{style}</Style>);
-
-        const styleTag = screen.getByTitle(`ReactStyleTag-${counter}`);
+        const styleTag = getRenderedStyleTag(<Style>{style}</Style>);
 
         expect(styleTag.nodeName).toBe('STYLE');
         expect(styleTag).toHaveTextContent(
@@ -61,9 +68,7 @@ describe('Style', () => {
         setGlobalOptions({ isMinified: false });
 
         const style = '.foo { display: flex; }';
-        render(<Style>{style}</Style>);
-
-        const styleTag = screen.getByTitle(`ReactStyleTag-${counter}`);
+        const styleTag = getRenderedStyleTag(<Style>{style}</Style>);
 
         expect(styleTag.nodeName).toBe('STYLE');
         expect(styleTag).toHaveTextContent(
@@ -77,9 +82,7 @@ describe('Style', () => {
         setGlobalOptions({ isPrefixed: true });
 
         const style = '.foo { display: flex; }';
-        render(<Style>{style}</Style>);
-
-        const styleTag = screen.getByTitle(`ReactStyleTag-${counter}`);
+        const styleTag = getRenderedStyleTag(<Style>{style}</Style>);
 
         expect(styleTag.nodeName).toBe('STYLE');
         expect(styleTag).toHaveTextContent(
@@ -91,9 +94,7 @@ describe('Style', () => {
         setGlobalOptions({ isPrefixed: false });
 
         const style = '.foo { display: flex; }';
-        render(<Style>{style}</Style>);
-
-        const styleTag = screen.getByTitle(`ReactStyleTag-${counter}`);
+        const styleTag = getRenderedStyleTag(<Style>{style}</Style>);
 
         expect(styleTag.nodeName).toBe('STYLE');
         expect(styleTag).toHaveTextContent(style);
@@ -105,9 +106,9 @@ describe('Style', () => {
     describe('hasSourceMap', () => {
       it('will set a `link` tag when it has a source map', () => {
         const style = '.foo { display: flex; }';
-        render(<Style hasSourceMap>{style}</Style>);
-
-        const styleTag = screen.getByTitle(`ReactStyleTag-${counter}`);
+        const styleTag = getRenderedStyleTag(
+          <Style hasSourceMap>{style}</Style>
+        );
 
         expect(styleTag.nodeName).toBe('LINK');
         expect(styleTag.getAttribute('rel')).toBe('stylesheet');
@@ -116,9 +117,9 @@ describe('Style', () => {
 
       it('will set a `style` tag when it does not have a source map', () => {
         const style = '.foo { display: flex; }';
-        render(<Style hasSourceMap={false}>{style}</Style>);
-
-        const styleTag = screen.getByTitle(`ReactStyleTag-${counter}`);
+        const styleTag = getRenderedStyleTag(
+          <Style hasSourceMap={false}>{style}</Style>
+        );
 
         expect(styleTag.nodeName).toBe('STYLE');
         expect(styleTag).toHaveTextContent(
@@ -130,9 +131,7 @@ describe('Style', () => {
     describe('isMinified', () => {
       it('will minify the output when true', () => {
         const style = '.foo { display: flex; }';
-        render(<Style isMinified>{style}</Style>);
-
-        const styleTag = screen.getByTitle(`ReactStyleTag-${counter}`);
+        const styleTag = getRenderedStyleTag(<Style isMinified>{style}</Style>);
 
         expect(styleTag.nodeName).toBe('STYLE');
         expect(styleTag).toHaveTextContent(
@@ -142,9 +141,9 @@ describe('Style', () => {
 
       it('will not minify the output when false', () => {
         const style = '.foo { display: flex; }';
-        render(<Style isMinified={false}>{style}</Style>);
-
-        const styleTag = screen.getByTitle(`ReactStyleTag-${counter}`);
+        const styleTag = getRenderedStyleTag(
+          <Style isMinified={false}>{style}</Style>
+        );
 
         expect(styleTag.nodeName).toBe('STYLE');
         expect(styleTag).toHaveTextContent(
@@ -158,9 +157,7 @@ describe('Style', () => {
         setGlobalOptions({ isPrefixed: true });
 
         const style = '.foo { display: flex; }';
-        render(<Style isPrefixed>{style}</Style>);
-
-        const styleTag = screen.getByTitle(`ReactStyleTag-${counter}`);
+        const styleTag = getRenderedStyleTag(<Style isPrefixed>{style}</Style>);
 
         expect(styleTag.nodeName).toBe('STYLE');
         expect(styleTag).toHaveTextContent(
@@ -172,9 +169,9 @@ describe('Style', () => {
         setGlobalOptions({ isPrefixed: false });
 
         const style = '.foo { display: flex; }';
-        render(<Style isPrefixed={false}>{style}</Style>);
-
-        const styleTag = screen.getByTitle(`ReactStyleTag-${counter}`);
+        const styleTag = getRenderedStyleTag(
+          <Style isPrefixed={false}>{style}</Style>
+        );
 
         expect(styleTag.nodeName).toBe('STYLE');
         expect(styleTag).toHaveTextContent(style);

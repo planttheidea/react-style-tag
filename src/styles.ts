@@ -1,24 +1,6 @@
 import { compile, serialize, stringify, middleware, prefixer } from 'stylis';
 
-import type { Options } from './options';
-
-interface BeautifyOptions {
-  autosemicolon?: boolean;
-  indent?: string;
-  openbrace?: boolean | string;
-}
-
-interface BeautifyState {
-  Start: number;
-  AtRule: number;
-  Block: number;
-  Selector: number;
-  Ruleset: number;
-  Property: number;
-  Separator: number;
-  Expression: number;
-  URL: number;
-}
+import type { BeautifyOptions, BeautifyState, Options } from '../index.d';
 
 const BEAUTIFY_OPTIONS = {
   autosemicolon: true,

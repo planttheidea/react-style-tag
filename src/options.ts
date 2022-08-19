@@ -1,8 +1,4 @@
-export interface Options {
-  hasSourceMap: boolean;
-  isMinified: boolean;
-  isPrefixed: boolean;
-}
+import { Options } from '../index.d';
 
 const IS_PRODUCTION =
   typeof process !== 'undefined' && process.env?.NODE_ENV === 'production';

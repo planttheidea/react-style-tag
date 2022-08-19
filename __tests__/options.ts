@@ -4,8 +4,7 @@ import {
   setGlobalOptions,
 } from '../src/options';
 
-import type { Options } from '../src/options';
-import type { Props } from '../src/Style';
+import type { Options } from '../index.d';
 
 describe('options', () => {
   afterEach(() => {

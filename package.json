@@ -58,9 +58,8 @@
   "module": "dist/react-style-tag.esm.js",
   "name": "react-style-tag",
   "peerDependencies": {
-    "prop-types": "^15.6.1",
-    "react": ">=16.6.0",
-    "react-dom": ">=16.6.0"
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
   },
   "repository": {
     "type": "git",

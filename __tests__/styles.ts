@@ -1,4 +1,4 @@
-import { beautify, getProcessedStyles } from '../src/styles';
+import { getProcessedStyles } from '../src/styles';
 import { DEFAULT_OPTIONS } from '../src/options';
 
 describe('styles', () => {

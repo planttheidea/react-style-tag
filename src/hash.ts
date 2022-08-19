@@ -5,7 +5,7 @@ let counter = 0;
  */
 export function hash<Key extends string>(
   key: Key
-): `scoped__${Key}__${string}` {
+): `scoped__${Key}__${number}` {
   const stringToHash = `${key}-${counter++}`;
 
   let hashValue = 5381;
@@ -23,10 +23,10 @@ export function hash<Key extends string>(
  */
 export function hashKeys<Keys extends readonly string[]>(
   keys: Keys
-): Record<Keys[number], string> {
+): { [Key in Keys[number]]: `scoped__${Key}__${number}` } {
   return keys.reduce((hashMap, key: Keys[number]) => {
     hashMap[key] = hash(key);
 
     return hashMap;
-  }, {} as Record<Keys[number], string>);
+  }, {} as { [Key in Keys[number]]: `scoped__${Key}__${number}` });
 }

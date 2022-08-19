@@ -4,21 +4,7 @@ import { normalizeOptions } from './options';
 import { getRenderedStyles } from './styles';
 
 import type { ComponentType, MutableRefObject } from 'react';
-import type { Options } from './options';
-
-export interface Props {
-  [key: string]: any;
-
-  children: string;
-  hasSourceMap?: boolean;
-  isMinified?: boolean;
-  isPrefixed?: boolean;
-}
-
-type PassedProps = Omit<
-  Props,
-  'children' | 'hasSourceMap' | 'isMinified' | 'isPrefixed'
->;
+import type { Options, Props, TagProps } from '../index.d';
 
 const INTERNAL_PROPS: Record<string, true> = {
   children: true,
@@ -31,8 +17,8 @@ const INTERNAL_PROPS: Record<string, true> = {
  * Extract the props used for deriving processed style for passing through to the
  * underlying HTML element.
  */
-function usePassedProps(props: Props): PassedProps {
-  const remainingProps: PassedProps = {};
+function useTagProps(props: Props): TagProps {
+  const remainingProps: TagProps = {};
 
   for (const key in props) {
     if (!INTERNAL_PROPS[key]) {
@@ -58,15 +44,10 @@ function useStyle(children: string, options: Options) {
   return styleRef.current;
 }
 
-let titleCount = 0;
-function useTitle() {
-  return useMemo(() => `ReactStyleTag-${titleCount++}`, []);
-}
-
 const Link = forwardRef<
   HTMLLinkElement,
-  { passedProps: PassedProps; style: string; title: string }
->(function LinkTag({ passedProps, style, title }, ref) {
+  { passedProps: TagProps; style: string }
+>(function LinkTag({ passedProps, style }, ref) {
   const getCachedLinkHref = useMemo(createGetCachedLinkHref, []);
 
   return createElement(
@@ -75,7 +56,6 @@ const Link = forwardRef<
       href: getCachedLinkHref(style),
       rel: 'stylesheet',
       ref,
-      title,
     })
   );
 });
@@ -84,26 +64,24 @@ export const Style = forwardRef<HTMLLinkElement | HTMLStyleElement, Props>(
   function Style(props, ref) {
     const { hasSourceMap, isMinified, isPrefixed } = props;
 
-    const passedProps = usePassedProps(props);
+    const passedProps = useTagProps(props);
     const options = useMemo(
       () => normalizeOptions({ hasSourceMap, isMinified, isPrefixed }),
       [hasSourceMap, isMinified, isPrefixed]
     );
     const style = useStyle(props.children, options);
-    const title = useTitle();
 
     if (options.hasSourceMap) {
       return createElement(Link, {
         passedProps,
         ref: ref as MutableRefObject<HTMLLinkElement>,
         style,
-        title,
       });
     }
 
     return createElement(
       'style',
-      Object.assign({}, passedProps, { ref, title }),
+      Object.assign({}, passedProps, { ref }),
       style
     );
   }

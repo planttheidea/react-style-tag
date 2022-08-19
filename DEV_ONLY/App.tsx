@@ -97,7 +97,7 @@ export default function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setMinified((minified) => !minified);
+      // setMinified((minified) => !minified);
       // hasSourceMap((sourceMap) => !sourceMap);
     }, 5000);
 
@@ -163,7 +163,7 @@ export default function App() {
           &:hover {
             background-color: red;
             color: white;
-          }
+          } 
         }
 
         @media screen and (min-width: 1000px) {
