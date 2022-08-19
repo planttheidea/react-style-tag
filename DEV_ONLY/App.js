@@ -1,13 +1,11 @@
-import 'babel-polyfill';
-
 import PropTypes from 'prop-types';
-import React, {PureComponent} from 'react';
+import React, { PureComponent } from 'react';
 
-import {hashKeys, Style} from '../src';
+import { hashKeys, Style } from '../src';
 
 const keys = ['test', 'foo', 'bar'];
 
-const {foo, bar, test} = hashKeys(keys);
+const { foo, bar, test } = hashKeys(keys);
 
 /**
  * get a random color for the text
@@ -23,10 +21,10 @@ const getRandomColor = () => {
 };
 
 Style.setGlobalOptions({
-  hasSourceMap: true
+  hasSourceMap: true,
 });
 
-const RegularDiv = ({color}) => (
+const RegularDiv = ({ color }) => (
   <div>
     <div className={foo}>I do not toggle</div>
 
@@ -42,10 +40,10 @@ const RegularDiv = ({color}) => (
 );
 
 RegularDiv.propTypes = {
-  color: PropTypes.string
+  color: PropTypes.string,
 };
 
-const UnprefixedDiv = ({color}) => (
+const UnprefixedDiv = ({ color }) => (
   <div>
     <div className={bar}>I have no prefixes</div>
 
@@ -62,10 +60,10 @@ const UnprefixedDiv = ({color}) => (
 );
 
 UnprefixedDiv.propTypes = {
-  color: PropTypes.string
+  color: PropTypes.string,
 };
 
-const ToggledDiv = ({color, id}) => (
+const ToggledDiv = ({ color, id }) => (
   <div>
     <div className={test}>I toggle</div>
 
@@ -83,40 +81,40 @@ const ToggledDiv = ({color, id}) => (
 
 ToggledDiv.propTypes = {
   color: PropTypes.string,
-  id: PropTypes.string
+  id: PropTypes.string,
 };
 
 class App extends PureComponent {
   state = {
     hasSourceMap: false,
     isToggledDivShown: false,
-    isVisible: true
+    isVisible: true,
   };
 
   componentDidMount() {
     setInterval(() => {
-      this.setState(({hasSourceMap}) => ({
-        hasSourceMap: !hasSourceMap
+      this.setState(({ hasSourceMap }) => ({
+        hasSourceMap: !hasSourceMap,
       }));
     }, 5000);
   }
 
   onClickToggleDiv = () => {
-    const {isToggledDivShown} = this.state;
+    const { isToggledDivShown } = this.state;
 
     this.setState({
-      isToggledDivShown: !isToggledDivShown
+      isToggledDivShown: !isToggledDivShown,
     });
   };
 
   onToggleVisible = () => {
-    this.setState(({isVisible}) => ({
-      isVisible: !isVisible
+    this.setState(({ isVisible }) => ({
+      isVisible: !isVisible,
     }));
   };
 
   render() {
-    const {hasSourceMap, isToggledDivShown, isVisible} = this.state;
+    const { hasSourceMap, isToggledDivShown, isVisible } = this.state;
 
     const color = getRandomColor();
 
@@ -125,15 +123,14 @@ class App extends PureComponent {
         <h1>App</h1>
 
         <div>
-          <button onClick={this.onToggleVisible}>Click to toggle main style</button>
+          <button onClick={this.onToggleVisible}>
+            Click to toggle main style
+          </button>
         </div>
 
         <span className="foo">When hovered, I turn red.</span>
 
-        <button
-          onClick={this.onClickToggleDiv}
-          type="button"
-        >
+        <button onClick={this.onClickToggleDiv} type="button">
           Toggle div
         </button>
 
@@ -149,10 +146,7 @@ class App extends PureComponent {
 
         {isToggledDivShown && (
           /* eslint-disable prettier */
-          <ToggledDiv
-            color={color}
-            id="toggle-one"
-          />
+          <ToggledDiv color={color} id="toggle-one" />
           /* eslint-enable */
         )}
 
@@ -160,10 +154,7 @@ class App extends PureComponent {
 
         {isToggledDivShown && (
           /* eslint-disable prettier */
-          <ToggledDiv
-            color={color}
-            id="toggle-two"
-          />
+          <ToggledDiv color={color} id="toggle-two" />
           /* eslint-enable */
         )}
 

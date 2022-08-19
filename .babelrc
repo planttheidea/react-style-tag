@@ -1,68 +1,35 @@
 {
   "env": {
-    "development": {
-      "presets": [
-        [
-          "env",
-          {
-            "loose": true,
-            "modules": false
-          }
-        ],
-        "react",
-        "stage-2"
-      ]
-    },
-    "es": {
-      "presets": [
-        [
-          "env",
-          {
-            "loose": true,
-            "modules": false
-          }
-        ],
-        "react",
-        "stage-2"
-      ]
-    },
     "lib": {
       "presets": [
         [
-          "env",
+          "@babel/preset-env",
           {
             "loose": true
           }
-        ],
-        "react",
-        "stage-2"
-      ]
-    },
-    "production": {
-      "plugins": ["transform-react-remove-prop-types"],
-      "presets": [
-        [
-          "env",
-          {
-            "loose": true,
-            "modules": false
-          }
-        ],
-        "react",
-        "stage-2"
+        ]
       ]
     },
     "test": {
       "presets": [
         [
-          "env",
+          "@babel/preset-env",
           {
             "loose": true
           }
-        ],
-        "react",
-        "stage-2"
+        ]
       ]
     }
-  }
+  },
+  "presets": [
+    "@babel/preset-typescript",
+    [
+      "@babel/preset-env",
+      {
+        "loose": true,
+        "modules": false
+      }
+    ],
+    "@babel/preset-react"
+  ]
 }
