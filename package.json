@@ -76,13 +76,14 @@
     "dist": "npm run clean:dist && npm run build",
     "lint": "NODE_ENV=test eslint src",
     "lint:fix": "NODE_ENV=test eslint src --fix",
-    "prepublishOnly": "npm run lint && npm run test && npm run clean && npm run transpile:lib && npm run transpile:es && npm run dist",
+    "prepublishOnly": "npm run lint && npm run typecheck && npm run test && npm run clean && npm run transpile:lib && npm run transpile:es && npm run dist",
     "start": "npm run dev",
     "test": "NODE_ENV=test NODE_PATH=. jest",
     "test:coverage": "npm test -- --coverage",
     "test:watch": "npm test -- --watch",
     "transpile:lib": "npm run clean:lib && BABEL_ENV=lib babel src --out-dir lib",
-    "transpile:es": "npm run clean:es && BABEL_ENV=es babel src --out-dir es"
+    "transpile:es": "npm run clean:es && BABEL_ENV=es babel src --out-dir es",
+    "typecheck": "tsc --noEmit"
   },
   "version": "2.0.5"
 }
