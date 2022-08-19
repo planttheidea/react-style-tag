@@ -83,5 +83,5 @@
     "transpile:es": "npm run clean:es && BABEL_ENV=es babel src --out-dir es",
     "typecheck": "tsc --noEmit"
   },
-  "version": "2.0.5"
+  "version": "3.0.0"
 }
