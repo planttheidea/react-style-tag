@@ -4,8 +4,6 @@
     "url": "https://github.com/planttheidea/react-style-tag/issues"
   },
   "dependencies": {
-    "cssbeautify": "^0.3.1",
-    "react-parm": "^1.0.0",
     "stylis": "^3.5.0"
   },
   "description": "Write scoped, autoprefixed styles declaratively in React",
@@ -27,8 +25,6 @@
     "enzyme": "^3.3.0",
     "enzyme-to-json": "^3.6.2",
     "eslint": "^8.22.0",
-    "eslint-config-rapid7": "^3.1.0",
-    "eslint-friendly-formatter": "^4.0.0",
     "eslint-webpack-plugin": "^3.2.0",
     "html-webpack-plugin": "^5.5.0",
     "in-publish": "2.0.1",
