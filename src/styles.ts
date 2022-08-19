@@ -2,11 +2,6 @@ import { compile, serialize, stringify, middleware, prefixer } from 'stylis';
 
 import type { BeautifyOptions, BeautifyState, Options } from '../index.d';
 
-const BEAUTIFY_OPTIONS = {
-  autosemicolon: true,
-  indent: '  ',
-};
-
 // FIXME: handle Unicode characters
 function isName(character: string): boolean {
   return (
@@ -484,5 +479,8 @@ export function getProcessedStyles(style: string, options: Options): string {
 export function getRenderedStyles(style: string, options: Options): string {
   const processed = getProcessedStyles(style, options);
 
-  return options.isMinified ? processed : beautify(processed, BEAUTIFY_OPTIONS);
+  return options.isMinified
+    ? processed
+    : /*#__NOINLINE__*/
+      beautify(processed, { autosemicolon: true, indent: '  ' });
 }

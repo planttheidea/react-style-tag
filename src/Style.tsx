@@ -64,12 +64,12 @@ export const Style = forwardRef<HTMLLinkElement | HTMLStyleElement, Props>(
   function Style(props, ref) {
     const { hasSourceMap, isMinified, isPrefixed } = props;
 
-    const passedProps = useTagProps(props);
+    const passedProps = /*#__NOINLINE__*/ useTagProps(props);
     const options = useMemo(
       () => normalizeOptions({ hasSourceMap, isMinified, isPrefixed }),
       [hasSourceMap, isMinified, isPrefixed]
     );
-    const style = useStyle(props.children, options);
+    const style = /*#__NOINLINE__*/ useStyle(props.children, options);
 
     if (options.hasSourceMap) {
       return createElement(Link, {
