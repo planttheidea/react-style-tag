@@ -1,15 +1,5 @@
-/**
- * Create the url string based on the available URL. If window is unavailable (such as in SSR),
- * then bail out.
- */
-export function getCreateObjectURL() {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  const URL = window.URL || window.webkitURL;
-
-  return URL.createObjectURL;
+function noop(): undefined {
+  return;
 }
 
 /**
@@ -26,12 +16,8 @@ export function createGetCachedLinkHref() {
       return href;
     }
 
-    if (!createObjectURL) {
+    if (createObjectURL === noop) {
       createObjectURL = getCreateObjectURL();
-
-      if (!createObjectURL) {
-        return;
-      }
     }
 
     if ((currentStyle = style)) {
@@ -40,4 +26,17 @@ export function createGetCachedLinkHref() {
 
     return (href = undefined);
   };
+}
+/**
+ * Create the url string based on the available URL. If window is unavailable (such as in SSR),
+ * then bail out.
+ */
+export function getCreateObjectURL() {
+  if (typeof window === 'undefined') {
+    return noop;
+  }
+
+  const URL = window.URL || window.webkitURL;
+
+  return URL.createObjectURL || noop;
 }

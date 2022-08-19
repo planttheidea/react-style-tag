@@ -1,7 +1,7 @@
 import { compile, serialize, stringify, middleware, prefixer } from 'stylis';
 import { BEAUTIFY_OPTIONS } from './constants';
-import { getCoalescedOption } from './options';
 
+import type { Options } from './options';
 import type { Props } from './Style';
 
 interface BeautifyOptions {
@@ -32,6 +32,10 @@ function isName(character: string) {
   );
 }
 
+function isQuote(char: string | null | undefined) {
+  return char === "'" || char === '"';
+}
+
 function isWhitespace(char: string) {
   return (
     char === ' ' ||
@@ -40,10 +44,6 @@ function isWhitespace(char: string) {
     char === '\r' ||
     char === '\f'
   );
-}
-
-function isQuote(char: string | null | undefined) {
-  return char === "'" || char === '"';
 }
 
 export function beautify(style: string, options: BeautifyOptions = {}) {
@@ -127,7 +127,7 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
   while (index < length) {
     character = style.charAt(index);
     character2 = style.charAt(index + 1);
-    index += 1;
+    ++index;
 
     // Inside a string literal?
     if (isQuote(quote)) {
@@ -140,7 +140,7 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
       if (character === '\\' && character2 === quote) {
         // Don't treat escaped character as the closing quote
         formatted += character2;
-        index += 1;
+        ++index;
       }
 
       continue;
@@ -161,7 +161,7 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
       if (character === '*' && character2 === '/') {
         comment = false;
         formatted += character2;
-        index += 1;
+        ++index;
       }
 
       continue;
@@ -170,7 +170,7 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
       comment = true;
       formatted += character;
       formatted += character2;
-      index += 1;
+      ++index;
 
       continue;
     }
@@ -482,11 +482,11 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
 /**
  * Get the styles processed for passing through to the element.
  */
-export function getProcessedStyles(style: string, props: Props): string {
-  const isPrefixed = getCoalescedOption(props, 'isPrefixed');
-
+export function getProcessedStyles(style: string, options: Options): string {
   const compiled = compile(style);
-  const enhancer = isPrefixed ? middleware([prefixer, stringify]) : stringify;
+  const enhancer = options.isPrefixed
+    ? middleware([prefixer, stringify])
+    : stringify;
 
   return serialize(compiled, enhancer);
 }
@@ -494,8 +494,8 @@ export function getProcessedStyles(style: string, props: Props): string {
 /**
  * Get the styles rendered in the HTML tag.
  */
-export function getRenderedStyles(style: string, props: Props): string {
-  const processed = getProcessedStyles(style, props);
+export function getRenderedStyles(style: string, options: Options): string {
+  const processed = getProcessedStyles(style, options);
 
-  return props.isMinified ? processed : beautify(processed, BEAUTIFY_OPTIONS);
+  return options.isMinified ? processed : beautify(processed, BEAUTIFY_OPTIONS);
 }

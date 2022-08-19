@@ -2,7 +2,6 @@ import { IS_PRODUCTION } from './constants';
 
 export interface Options {
   hasSourceMap: boolean;
-  isCompressed: boolean;
   isMinified: boolean;
   isPrefixed: boolean;
 }
@@ -12,12 +11,19 @@ export interface Options {
  */
 export const DEFAULT_OPTIONS: Options = {
   hasSourceMap: !IS_PRODUCTION,
-  isCompressed: true,
   isMinified: IS_PRODUCTION,
   isPrefixed: true,
 };
 
-let globalOptions: Options = { ...DEFAULT_OPTIONS };
+const AVAILABLE_OPTIONS = (
+  Object.keys(DEFAULT_OPTIONS) as Array<keyof Options>
+).reduce((options, key) => {
+  options[key] = true;
+
+  return options;
+}, {} as Record<keyof Options, true>);
+
+let globalOptions: Options = Object.assign({}, DEFAULT_OPTIONS);
 
 /**
  * Get the option either from props if it exists, or globally.
@@ -29,6 +35,23 @@ export function getCoalescedOption(
   const value = props[option];
 
   return value != null ? !!value : globalOptions[option];
+}
+
+export function getGlobalOptions() {
+  return globalOptions;
+}
+
+export function normalizeOptions(options: Partial<Options>): Options {
+  const normalized: Options = Object.assign({}, globalOptions);
+  let option: keyof Options;
+
+  for (option in options) {
+    if (normalized.hasOwnProperty(option) && options[option] != null) {
+      normalized[option] = !!options[option];
+    }
+  }
+
+  return normalized;
 }
 
 /**
