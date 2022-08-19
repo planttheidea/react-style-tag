@@ -1,17 +1,19 @@
-function noop(): undefined {
+const noop = function noopCreateObjectUrl(): undefined {
   return;
-}
+} as unknown as typeof URL.createObjectURL;
 
 /**
  * Create a cached version of the getLinkHref.
  */
-export function createGetCachedLinkHref() {
+export function createGetCachedLinkHref(): (
+  style: string
+) => string | undefined {
   let href: string | undefined;
   let createObjectURL: ReturnType<typeof getCreateObjectURL> =
     getCreateObjectURL();
   let currentStyle: string | null = null;
 
-  return function (style: string): string | undefined {
+  return function getCachedLinkedHref(style: string): string | undefined {
     if (style === currentStyle) {
       return href;
     }
@@ -31,7 +33,7 @@ export function createGetCachedLinkHref() {
  * Create the url string based on the available URL. If window is unavailable (such as in SSR),
  * then bail out.
  */
-export function getCreateObjectURL() {
+export function getCreateObjectURL(): typeof URL.createObjectURL {
   if (typeof window === 'undefined') {
     return noop;
   }

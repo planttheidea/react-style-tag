@@ -1,8 +1,6 @@
 import { compile, serialize, stringify, middleware, prefixer } from 'stylis';
-import { BEAUTIFY_OPTIONS } from './constants';
 
 import type { Options } from './options';
-import type { Props } from './Style';
 
 interface BeautifyOptions {
   autosemicolon?: boolean;
@@ -22,8 +20,13 @@ interface BeautifyState {
   URL: number;
 }
 
+const BEAUTIFY_OPTIONS = {
+  autosemicolon: true,
+  indent: '  ',
+};
+
 // FIXME: handle Unicode characters
-function isName(character: string) {
+function isName(character: string): boolean {
   return (
     (character >= 'a' && character <= 'z') ||
     (character >= 'A' && character <= 'Z') ||
@@ -32,11 +35,11 @@ function isName(character: string) {
   );
 }
 
-function isQuote(char: string | null | undefined) {
+function isQuote(char: string | null | undefined): boolean {
   return char === "'" || char === '"';
 }
 
-function isWhitespace(char: string) {
+function isWhitespace(char: string): boolean {
   return (
     char === ' ' ||
     char === '\n' ||
@@ -46,7 +49,7 @@ function isWhitespace(char: string) {
   );
 }
 
-export function beautify(style: string, options: BeautifyOptions = {}) {
+export function beautify(style: string, options: BeautifyOptions = {}): string {
   // We want to deal with LF (\n) only
   style = style.replace(/\r\n/g, '\n');
 
@@ -57,13 +60,13 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
   } = options;
 
   let index = 0;
-  let length = style.length;
-  let blocks: string[] = [];
+  const length = style.length;
+  const blocks: string[] = [];
   let formatted = '';
   let character: string;
   let character2: string;
   let string: string;
-  let State: BeautifyState = {
+  const State: BeautifyState = {
     Start: 0,
     AtRule: 1,
     Block: 2,
@@ -214,6 +217,7 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
           } else {
             // After block comment, keep all the linefeeds but
             // start from the first column (remove whitespaces prefix).
+            // eslint-disable-next-line no-constant-condition
             while (true) {
               character2 = formatted.charAt(formatted.length - 1);
 
@@ -276,6 +280,7 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
           } else {
             // After block comment, keep all the linefeeds but
             // start from the first column (remove whitespaces prefix).
+            // eslint-disable-next-line no-constant-condition
             while (true) {
               character2 = formatted.charAt(formatted.length - 1);
 

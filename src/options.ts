@@ -1,10 +1,11 @@
-import { IS_PRODUCTION } from './constants';
-
 export interface Options {
   hasSourceMap: boolean;
   isMinified: boolean;
   isPrefixed: boolean;
 }
+
+const IS_PRODUCTION =
+  typeof process !== 'undefined' && process.env?.NODE_ENV === 'production';
 
 /**
  * The global options to apply as fallback to local props.
@@ -15,15 +16,8 @@ export const DEFAULT_OPTIONS: Options = {
   isPrefixed: true,
 };
 
-const AVAILABLE_OPTIONS = (
-  Object.keys(DEFAULT_OPTIONS) as Array<keyof Options>
-).reduce((options, key) => {
-  options[key] = true;
-
-  return options;
-}, {} as Record<keyof Options, true>);
-
-let globalOptions: Options = Object.assign({}, DEFAULT_OPTIONS);
+const globalOptions: Options = Object.assign({}, DEFAULT_OPTIONS);
+const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 /**
  * Get the option either from props if it exists, or globally.
@@ -37,7 +31,7 @@ export function getCoalescedOption(
   return value != null ? !!value : globalOptions[option];
 }
 
-export function getGlobalOptions() {
+export function getGlobalOptions(): Options {
   return globalOptions;
 }
 
@@ -46,7 +40,7 @@ export function normalizeOptions(options: Partial<Options>): Options {
   let option: keyof Options;
 
   for (option in options) {
-    if (normalized.hasOwnProperty(option) && options[option] != null) {
+    if (hasOwnProperty.call(normalized, option) && options[option] != null) {
       normalized[option] = !!options[option];
     }
   }
@@ -61,7 +55,7 @@ export function setGlobalOptions(options: Partial<Options>): void {
   let option: keyof Options;
 
   for (option in options) {
-    if (globalOptions.hasOwnProperty(option)) {
+    if (hasOwnProperty.call(globalOptions, option)) {
       globalOptions[option] = !!options[option];
     }
   }

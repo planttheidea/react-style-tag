@@ -1,6 +1,6 @@
 import { createElement, forwardRef, useMemo, useRef } from 'react';
 import { createGetCachedLinkHref } from './blob';
-import { DEFAULT_OPTIONS, normalizeOptions } from './options';
+import { normalizeOptions } from './options';
 import { getRenderedStyles } from './styles';
 
 import type { MutableRefObject } from 'react';
@@ -16,11 +16,10 @@ export interface Props {
   isPrefixed?: boolean;
 }
 
-interface PassedProps
-  extends Omit<
+type PassedProps = Omit<
     Props,
     'children' | 'hasSourceMap' | 'isMinified' | 'isPrefixed'
-  > {}
+  >
 
 const INTERNAL_PROPS: Record<string, true> = {
   children: true,
