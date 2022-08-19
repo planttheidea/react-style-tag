@@ -1,30 +1,24 @@
-type Url = typeof window.URL;
-
-const EMPTY_URL = {
-  createObjectURL() {},
-} as unknown as Url;
-
 /**
- * get the URL used to generate blobs
+ * Create the url string based on the available URL. If window is unavailable (such as in SSR),
+ * then bail out.
  */
-export function getUrl(): Url {
-  return typeof window === 'undefined'
-    ? EMPTY_URL
-    : window.URL || window.webkitURL;
+export function getCreateObjectURL() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const URL = window.URL || window.webkitURL;
+
+  return URL.createObjectURL;
 }
 
 /**
- * get the href of the link based on the style string Blob
- */
-export function getLinkHref(style: string): string {
-  return getUrl().createObjectURL(new Blob([style], { type: 'text/css' }));
-}
-
-/**
- * create a cached version of the getLinkHref
+ * Create a cached version of the getLinkHref.
  */
 export function createGetCachedLinkHref() {
   let href: string | undefined;
+  let createObjectURL: ReturnType<typeof getCreateObjectURL> =
+    getCreateObjectURL();
   let currentStyle: string | null = null;
 
   return function (style: string): string | undefined {
@@ -32,8 +26,16 @@ export function createGetCachedLinkHref() {
       return href;
     }
 
+    if (!createObjectURL) {
+      createObjectURL = getCreateObjectURL();
+
+      if (!createObjectURL) {
+        return;
+      }
+    }
+
     if ((currentStyle = style)) {
-      return (href = getLinkHref(style));
+      return (href = createObjectURL(new Blob([style], { type: 'text/css' })));
     }
 
     return (href = undefined);

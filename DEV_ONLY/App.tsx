@@ -1,6 +1,10 @@
-import { PureComponent, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { setGlobalOptions, hashKeys, Style } from '../src';
 
-import { hashKeys, Style } from '../src';
+interface DivProps {
+  color: string;
+  id?: string;
+}
 
 const keys = hashKeys(['test', 'foo', 'bar'] as const);
 
@@ -15,11 +19,11 @@ function getRandomColor() {
   return `rgb(${randomR}, ${randomG}, ${randomB})`;
 }
 
-Style.setGlobalOptions({
+setGlobalOptions({
   hasSourceMap: true,
 });
 
-function RegularDiv({ color }) {
+function RegularDiv({ color }: DivProps) {
   return (
     <div>
       <div className={keys.foo}>I do not toggle</div>
@@ -36,7 +40,7 @@ function RegularDiv({ color }) {
   );
 }
 
-function UnprefixedDiv({ color }) {
+function UnprefixedDiv({ color }: DivProps) {
   return (
     <div>
       <div className={keys.bar}>I have no prefixes</div>
@@ -54,7 +58,7 @@ function UnprefixedDiv({ color }) {
   );
 }
 
-function ToggledDiv({ color, id }) {
+function ToggledDiv({ color, id }: DivProps) {
   return (
     <div>
       <div className={keys.test}>I toggle</div>

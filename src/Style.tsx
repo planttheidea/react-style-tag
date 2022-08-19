@@ -1,9 +1,11 @@
-import { useMemo, useRef } from 'react';
+import React, { forwardRef, useMemo, useRef } from 'react';
 import { createGetCachedLinkHref } from './blob';
-import { getCoalescedOption, setGlobalOptions } from './options';
+import { getCoalescedOption } from './options';
 import { getRenderedStyles } from './styles';
 
 export interface Props {
+  [key: string]: any;
+
   children: string;
   hasSourceMap?: boolean;
   id?: string;
@@ -12,6 +14,27 @@ export interface Props {
   isPrefixed?: boolean;
 }
 
+type PassedProps = Omit<
+  Props,
+  'children' | 'hasSourceMap' | 'isCompressed' | 'isMinified' | 'isPrefixed'
+>;
+
+function usePassedProps(props: Props): PassedProps {
+  const {
+    children: _children,
+    hasSourceMap: _hasSourceMap,
+    isCompressed: _isCompressed,
+    isMinified: _isMinified,
+    isPrefixed: _isPrefixed,
+    ...remainingProps
+  } = props;
+
+  return remainingProps;
+}
+
+/**
+ * Calculate and store the style in a local reference.
+ */
 function useStyle(props: Props) {
   const { children } = props;
 
@@ -26,54 +49,45 @@ function useStyle(props: Props) {
   return styleRef.current;
 }
 
-function LinkTag(props: Props) {
-  const {
-    children: _children,
-    hasSourceMap: _hasSourceMap,
-    isCompressed: _isCompressed,
-    isPrefixed: _isPrefixed,
-    ...remainingProps
-  } = props;
-
+const LinkTag = forwardRef<HTMLLinkElement, Props>(function LinkTag(
+  props,
+  ref
+) {
+  const passedProps = usePassedProps(props);
   const getCachedLinkHref = useMemo(createGetCachedLinkHref, []);
-  const ref = useRef<HTMLLinkElement>(null);
   const style = useStyle(props);
 
   return (
     <link
-      {...remainingProps}
+      {...passedProps}
       href={getCachedLinkHref(style)}
-      ref={ref}
       rel="stylesheet"
+      ref={ref}
     />
   );
-}
+});
 
-function StyleTag(props: Props) {
-  const {
-    children: _children,
-    hasSourceMap: _hasSourceMap,
-    isCompressed: _isCompressed,
-    isPrefixed: _isPrefixed,
-    ...remainingProps
-  } = props;
-
-  const ref = useRef<HTMLLinkElement>(null);
+const StyleTag = forwardRef<HTMLStyleElement, Props>(function StyleTag(
+  props,
+  ref
+) {
+  const passedProps = usePassedProps(props);
   const style = useStyle(props);
 
   return (
-    <style ref={ref} {...remainingProps}>
+    <style {...passedProps} ref={ref}>
       {style}
     </style>
   );
-}
+});
 
-export default function Style(props) {
-  return getCoalescedOption(props, 'hasSourceMap') ? (
-    <LinkTag {...props} />
-  ) : (
-    <StyleTag {...props} />
-  );
-}
+export const Style = forwardRef<HTMLLinkElement | HTMLStyleElement, Props>(
+  function Style(props, ref) {
+    const Element = getCoalescedOption(props, 'hasSourceMap')
+      ? LinkTag
+      : StyleTag;
 
-Style.setGlobalOptions = setGlobalOptions;
+    // @ts-expect-error - `link` vs `style` has different `ref` setups.
+    return <Element {...props} ref={ref} />;
+  }
+);

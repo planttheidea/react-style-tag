@@ -1,7 +1,7 @@
 let counter = 0;
 
 /**
- * simple bitwise hash of string value
+ * Simple bitwise hash of string value.
  */
 export function hash<Key extends string>(
   key: Key
@@ -19,12 +19,12 @@ export function hash<Key extends string>(
 }
 
 /**
- * create a hash map based on the keys passed
+ * Create a hash map based on the keys passed.
  */
 export function hashKeys<Keys extends readonly string[]>(
   keys: Keys
 ): Record<Keys[number], string> {
-  return keys.reduce((hashMap, key) => {
+  return keys.reduce((hashMap, key: Keys[number]) => {
     hashMap[key] = hash(key);
 
     return hashMap;

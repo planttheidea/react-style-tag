@@ -1,7 +1,6 @@
-// constants
 import { IS_PRODUCTION } from './constants';
 
-interface Options {
+export interface Options {
   hasSourceMap: boolean;
   isCompressed: boolean;
   isMinified: boolean;
@@ -9,7 +8,7 @@ interface Options {
 }
 
 /**
- * he global options to apply as fallback to local props
+ * The global options to apply as fallback to local props.
  */
 export const DEFAULT_OPTIONS: Options = {
   hasSourceMap: !IS_PRODUCTION,
@@ -21,7 +20,7 @@ export const DEFAULT_OPTIONS: Options = {
 let globalOptions: Options = { ...DEFAULT_OPTIONS };
 
 /**
- * get the option either from props if it exists, or globally
+ * Get the option either from props if it exists, or globally.
  */
 export function getCoalescedOption(
   props: Record<string, any>,
@@ -33,10 +32,12 @@ export function getCoalescedOption(
 }
 
 /**
- * set the options passed to be global
+ * Set the options passed to be global.
  */
 export function setGlobalOptions(options: Partial<Options>): void {
-  for (const option in options) {
+  let option: keyof Options;
+
+  for (option in options) {
     if (globalOptions.hasOwnProperty(option)) {
       globalOptions[option] = !!options[option];
     }

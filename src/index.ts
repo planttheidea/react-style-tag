@@ -1,10 +1,6 @@
-// components
-import Style from './Style';
+export { Style } from './Style';
+export { hashKeys } from './hash';
+export { setGlobalOptions } from './options';
 
-// hash
-import {hashKeys} from './hash';
-
-// options
-import {setGlobalOptions} from './options';
-
-export {hashKeys, setGlobalOptions, Style};
+export type { Props as StyleProps } from './Style';
+export type { Options } from './options';
