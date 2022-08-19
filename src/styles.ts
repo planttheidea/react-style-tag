@@ -22,7 +22,34 @@ interface BeautifyState {
   URL: number;
 }
 
+// FIXME: handle Unicode characters
+function isName(character: string) {
+  return (
+    (character >= 'a' && character <= 'z') ||
+    (character >= 'A' && character <= 'Z') ||
+    (character >= '0' && character <= '9') ||
+    '-_*.:#[]'.indexOf(character) >= 0
+  );
+}
+
+function isWhitespace(char: string) {
+  return (
+    char === ' ' ||
+    char === '\n' ||
+    char === '\t' ||
+    char === '\r' ||
+    char === '\f'
+  );
+}
+
+function isQuote(char: string | null | undefined) {
+  return char === "'" || char === '"';
+}
+
 export function beautify(style: string, options: BeautifyOptions = {}) {
+  // We want to deal with LF (\n) only
+  style = style.replace(/\r\n/g, '\n');
+
   const {
     autosemicolon = false,
     indent = '  ',
@@ -31,12 +58,11 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
 
   let index = 0;
   let length = style.length;
-  let blocks: string[];
+  let blocks: string[] = [];
   let formatted = '';
   let character: string;
   let character2: string;
   let string: string;
-  let state;
   let State: BeautifyState = {
     Start: 0,
     AtRule: 1,
@@ -48,37 +74,20 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
     Expression: 7,
     URL: 8,
   };
+  let state = State.Start;
   let depth = 0;
   let quote;
-  let comment;
-
-  function isWhitespace(c: string) {
-    return c === ' ' || c === '\n' || c === '\t' || c === '\r' || c === '\f';
-  }
-
-  function isQuote(c: string | null | undefined) {
-    return c === "'" || c === '"';
-  }
-
-  // FIXME: handle Unicode characters
-  function isName(c: string) {
-    return (
-      (character >= 'a' && character <= 'z') ||
-      (character >= 'A' && character <= 'Z') ||
-      (character >= '0' && character <= '9') ||
-      '-_*.:#[]'.indexOf(c) >= 0
-    );
-  }
+  let comment = false;
 
   function appendIndent() {
-    let i;
-    for (i = depth; i > 0; i -= 1) {
+    for (let index = depth; index > 0; --index) {
       formatted += indent;
     }
   }
 
   function openBlock() {
     formatted = formatted.trimEnd();
+
     if (openbracesuffix) {
       formatted += ' {';
     } else {
@@ -86,19 +95,23 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
       appendIndent();
       formatted += '{';
     }
+
     if (character2 !== '\n') {
       formatted += '\n';
     }
+
     depth += 1;
   }
 
   function closeBlock() {
     let last;
+
     depth -= 1;
     formatted = formatted.trimEnd();
 
     if (formatted.length > 0 && autosemicolon) {
       last = formatted.charAt(formatted.length - 1);
+
       if (last !== ';' && last !== '{') {
         formatted += ';';
       }
@@ -111,13 +124,6 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
     formatted = '';
   }
 
-  state = State.Start;
-  comment = false;
-  blocks = [];
-
-  // We want to deal with LF (\n) only
-  style = style.replace(/\r\n/g, '\n');
-
   while (index < length) {
     character = style.charAt(index);
     character2 = style.charAt(index + 1);
@@ -126,14 +132,17 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
     // Inside a string literal?
     if (isQuote(quote)) {
       formatted += character;
+
       if (character === quote) {
         quote = null;
       }
+
       if (character === '\\' && character2 === quote) {
         // Don't treat escaped character as the closing quote
         formatted += character2;
         index += 1;
       }
+
       continue;
     }
 
@@ -141,17 +150,20 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
     if (isQuote(character)) {
       formatted += character;
       quote = character;
+
       continue;
     }
 
     // Comment
     if (comment) {
       formatted += character;
+
       if (character === '*' && character2 === '/') {
         comment = false;
         formatted += character2;
         index += 1;
       }
+
       continue;
     }
     if (character === '/' && character2 === '*') {
@@ -159,20 +171,24 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
       formatted += character;
       formatted += character2;
       index += 1;
+
       continue;
     }
 
     if (state === State.Start) {
-      if (blocks.length === 0) {
-        if (isWhitespace(character) && formatted.length === 0) {
-          continue;
-        }
+      if (
+        blocks.length === 0 &&
+        isWhitespace(character) &&
+        formatted.length === 0
+      ) {
+        continue;
       }
 
       // Copy white spaces and control characters
       if (character <= ' ' || character.charCodeAt(0) >= 128) {
         state = State.Start;
         formatted += character;
+
         continue;
       }
 
@@ -189,27 +205,30 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
             formatted = '\n\n';
           }
         } else {
+          const lastChar = string.charAt(string.length - 1);
+
           // After finishing a ruleset or directive statement,
           // there should be one blank line.
-          if (
-            string.charAt(string.length - 1) === '}' ||
-            string.charAt(string.length - 1) === ';'
-          ) {
+          if (lastChar === '}' || lastChar === ';') {
             formatted = string + '\n\n';
           } else {
             // After block comment, keep all the linefeeds but
             // start from the first column (remove whitespaces prefix).
             while (true) {
               character2 = formatted.charAt(formatted.length - 1);
+
               if (character2 !== ' ' && character2.charCodeAt(0) !== 9) {
                 break;
               }
+
               formatted = formatted.substr(0, formatted.length - 1);
             }
           }
         }
+
         formatted += character;
         state = character === '@' ? State.AtRule : State.Selector;
+
         continue;
       }
     }
@@ -219,6 +238,7 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
       if (character === ';') {
         formatted += character;
         state = State.Start;
+
         continue;
       }
 
@@ -227,10 +247,12 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
         string = formatted.trimEnd();
         openBlock();
         state = string === '@font-face' ? State.Ruleset : State.Block;
+
         continue;
       }
 
       formatted += character;
+
       continue;
     }
 
@@ -256,9 +278,11 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
             // start from the first column (remove whitespaces prefix).
             while (true) {
               character2 = formatted.charAt(formatted.length - 1);
+
               if (character2 !== ' ' && character2.charCodeAt(0) !== 9) {
                 break;
               }
+
               formatted = formatted.substr(0, formatted.length - 1);
             }
           }
@@ -267,6 +291,7 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
         appendIndent();
         formatted += character;
         state = State.Selector;
+
         continue;
       }
 
@@ -274,10 +299,12 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
       if (character === '}') {
         closeBlock();
         state = State.Start;
+
         continue;
       }
 
       formatted += character;
+
       continue;
     }
 
@@ -286,6 +313,7 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
       if (character === '{') {
         openBlock();
         state = State.Ruleset;
+
         continue;
       }
 
@@ -293,10 +321,12 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
       if (character === '}') {
         closeBlock();
         state = State.Start;
+
         continue;
       }
 
       formatted += character;
+
       continue;
     }
 
@@ -305,9 +335,11 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
       if (character === '}') {
         closeBlock();
         state = State.Start;
+
         if (depth > 0) {
           state = State.Block;
         }
+
         continue;
       }
 
@@ -315,6 +347,7 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
       if (character === '\n') {
         formatted = formatted.trimEnd();
         formatted += '\n';
+
         continue;
       }
 
@@ -325,9 +358,12 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
         appendIndent();
         formatted += character;
         state = State.Property;
+
         continue;
       }
+
       formatted += character;
+
       continue;
     }
 
@@ -337,9 +373,11 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
         formatted = formatted.trimEnd();
         formatted += ': ';
         state = State.Expression;
+
         if (isWhitespace(character2)) {
           state = State.Separator;
         }
+
         continue;
       }
 
@@ -347,13 +385,16 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
       if (character === '}') {
         closeBlock();
         state = State.Start;
+
         if (depth > 0) {
           state = State.Block;
         }
+
         continue;
       }
 
       formatted += character;
+
       continue;
     }
 
@@ -362,6 +403,7 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
       if (!isWhitespace(character)) {
         formatted += character;
         state = State.Expression;
+
         continue;
       }
 
@@ -378,9 +420,11 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
       if (character === '}') {
         closeBlock();
         state = State.Start;
+
         if (depth > 0) {
           state = State.Block;
         }
+
         continue;
       }
 
@@ -389,39 +433,40 @@ export function beautify(style: string, options: BeautifyOptions = {}) {
         formatted = formatted.trimEnd();
         formatted += ';\n';
         state = State.Ruleset;
+
         continue;
       }
 
       formatted += character;
 
-      if (character === '(') {
-        if (
-          formatted.charAt(formatted.length - 2) === 'l' &&
-          formatted.charAt(formatted.length - 3) === 'r' &&
-          formatted.charAt(formatted.length - 4) === 'u'
-        ) {
-          // URL starts with '(' and closes with ')'.
-          state = State.URL;
-          continue;
-        }
+      if (
+        character === '(' &&
+        formatted.charAt(formatted.length - 2) === 'l' &&
+        formatted.charAt(formatted.length - 3) === 'r' &&
+        formatted.charAt(formatted.length - 4) === 'u'
+      ) {
+        // URL starts with '(' and closes with ')'.
+        state = State.URL;
+
+        continue;
       }
 
       continue;
     }
 
-    if (state === State.URL) {
+    if (
+      state === State.URL &&
       // ')' finishes the URL (only if it is not escaped).
-      if (
-        character === ')' &&
-        formatted.charAt(
-          // @ts-expect-error - testing multiline
-          formatted.length - 1 !== '\\' ? 1 : 0
-        )
-      ) {
-        formatted += character;
-        state = State.Expression;
-        continue;
-      }
+      character === ')' &&
+      formatted.charAt(
+        // @ts-expect-error - testing multiline
+        formatted.length - 1 !== '\\' ? 1 : 0
+      )
+    ) {
+      formatted += character;
+      state = State.Expression;
+
+      continue;
     }
 
     // The default action is to copy the character (to prevent
