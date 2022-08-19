@@ -1,13 +1,9 @@
-// Remove existing Blob polyfill
-window.Blob = undefined;
-
-const blobPolyfill = require('blob-polyfill');
 require('core-js');
 
-window.Blob = blobPolyfill.Blob;
-window.File = blobPolyfill.File;
-window.FileReader = blobPolyfill.FileReader;
+// Remove existing Blob implementation, as it is incomplete from `jsdom`
+window.Blob = undefined;
 
-Object.defineProperty(window, 'URL', {
-  value: URL,
-});
+const { Blob, File, FileReader } = require('blob-polyfill');
+window.Blob = Blob;
+window.File = File;
+window.FileReader = FileReader;
