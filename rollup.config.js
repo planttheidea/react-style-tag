@@ -1,69 +1,57 @@
-import babel from 'rollup-plugin-babel';
-import commonjs from 'rollup-plugin-commonjs';
-import resolve from 'rollup-plugin-node-resolve';
-import uglify from 'rollup-plugin-uglify';
+import babel from '@rollup/plugin-babel';
+import resolve from '@rollup/plugin-node-resolve';
+import { terser } from 'rollup-plugin-terser';
+import pkg from './package.json';
+
+const EXTERNALS = [
+  ...Object.keys(pkg.dependencies || {}),
+  ...Object.keys(pkg.peerDependencies || {}),
+];
+
+const DEFAULT_OUTPUT = {
+  exports: 'named',
+  file: 'dist/react-style-tag.js',
+  globals: {
+    react: 'React',
+    'react-dom': 'ReactDOM',
+    stylis: 'stylis',
+  },
+  name: 'ReactStyleTag',
+  sourcemap: true,
+};
+const EXTENSIONS = ['.js', '.ts', '.tsx'];
+
+const DEFAULT_CONFIG = {
+  external: EXTERNALS,
+  input: 'src/index.ts',
+  output: [
+    { ...DEFAULT_OUTPUT, file: pkg.browser, format: 'umd' },
+    { ...DEFAULT_OUTPUT, file: pkg.main, format: 'cjs' },
+    { ...DEFAULT_OUTPUT, file: pkg.module, format: 'es' },
+  ],
+  plugins: [
+    resolve({
+      extensions: EXTENSIONS,
+      mainFields: ['module', 'jsnext:main', 'main'],
+    }),
+    babel({
+      babelHelpers: 'bundled',
+      exclude: 'node_modules/**',
+      extensions: EXTENSIONS,
+      include: ['src/*'],
+    }),
+  ],
+};
 
 export default [
+  DEFAULT_CONFIG,
   {
-    external: ['prop-types', 'react', 'react-dom'],
-    input: 'src/index.js',
+    ...DEFAULT_CONFIG,
     output: {
-      exports: 'named',
-      file: 'dist/react-style-tag.js',
+      ...DEFAULT_OUTPUT,
+      file: pkg.browser.replace('.js', '.min.js'),
       format: 'umd',
-      globals: {
-        'prop-types': 'PropTypes',
-        react: 'React',
-        'react-dom': 'ReactDOM'
-      },
-      name: 'ReactStyleTag',
-      sourcemap: true
     },
-    plugins: [
-      commonjs({
-        include: 'node_modules/**'
-      }),
-      resolve({
-        main: true,
-        module: true
-      }),
-      babel({
-        exclude: 'node_modules/**'
-      })
-    ],
-    treeshake: {
-      pureExternalModules: true
-    }
+    plugins: [...DEFAULT_CONFIG.plugins, terser()],
   },
-  {
-    external: ['prop-types', 'react', 'react-dom'],
-    input: 'src/index.js',
-    output: {
-      exports: 'named',
-      file: 'dist/react-style-tag.min.js',
-      format: 'umd',
-      globals: {
-        'prop-types': 'PropTypes',
-        react: 'React',
-        'react-dom': 'ReactDOM'
-      },
-      name: 'ReactStyleTag'
-    },
-    plugins: [
-      commonjs({
-        include: 'node_modules/**'
-      }),
-      resolve({
-        main: true,
-        module: true
-      }),
-      babel({
-        exclude: 'node_modules/**'
-      }),
-      uglify()
-    ],
-    treeshake: {
-      pureExternalModules: true
-    }
-  }
 ];
