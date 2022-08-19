@@ -6,7 +6,7 @@ import { getCoalescedOption } from './options';
 import type { Props } from './Style';
 
 /**
- * get the styles processed by stylis
+ * Get the styles processed for passing through to the element.
  */
 export function getProcessedStyles(style: string, props: Props): string {
   return new Stylis({
@@ -18,7 +18,7 @@ export function getProcessedStyles(style: string, props: Props): string {
 }
 
 /**
- * get the styles rendered in the HTML tag
+ * Get the styles rendered in the HTML tag.
  */
 export function getRenderedStyles(style: string, props: Props): string {
   const processed = getProcessedStyles(style, props);

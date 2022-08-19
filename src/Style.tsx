@@ -19,6 +19,10 @@ type PassedProps = Omit<
   'children' | 'hasSourceMap' | 'isCompressed' | 'isMinified' | 'isPrefixed'
 >;
 
+/**
+ * Extract the props used for deriving processed style for passing through to the
+ * underlying HTML element.
+ */
 function usePassedProps(props: Props): PassedProps {
   const {
     children: _children,
