@@ -15,7 +15,6 @@ export interface Props {
 function useStyle(props: Props) {
   const { children } = props;
 
-  const ref = useRef();
   const childrenRef = useRef<string>(children);
   const styleRef = useRef<string>();
 

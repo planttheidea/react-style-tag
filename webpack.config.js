@@ -7,7 +7,7 @@ const ROOT = __dirname;
 module.exports = {
   devtool: 'source-map',
 
-  entry: [path.resolve(ROOT, 'DEV_ONLY', 'index.js')],
+  entry: [path.resolve(ROOT, 'DEV_ONLY', 'index.tsx')],
 
   mode: 'development',
 

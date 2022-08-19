@@ -21,10 +21,12 @@ export function hash<Key extends string>(
 /**
  * create a hash map based on the keys passed
  */
-export function hashKeys(keys: string[]): Record<string, string> {
+export function hashKeys<Keys extends readonly string[]>(
+  keys: Keys
+): Record<Keys[number], string> {
   return keys.reduce((hashMap, key) => {
     hashMap[key] = hash(key);
 
     return hashMap;
-  }, {});
+  }, {} as Record<Keys[number], string>);
 }
