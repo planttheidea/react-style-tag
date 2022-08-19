@@ -1,6 +1,24 @@
 import { compile, serialize, stringify, middleware, prefixer } from 'stylis';
 
-import type { BeautifyOptions, BeautifyState, Options } from '../index.d';
+import type { Options } from '../index.d';
+
+interface BeautifyOptions {
+  autosemicolon?: boolean;
+  indent?: string;
+  openbrace?: boolean | string;
+}
+
+interface BeautifyState {
+  Start: number;
+  AtRule: number;
+  Block: number;
+  Selector: number;
+  Ruleset: number;
+  Property: number;
+  Separator: number;
+  Expression: number;
+  URL: number;
+}
 
 // FIXME: handle Unicode characters
 function isName(character: string): boolean {

@@ -4,7 +4,13 @@ import { normalizeOptions } from './options';
 import { getRenderedStyles } from './styles';
 
 import type { ComponentType, MutableRefObject } from 'react';
-import type { Options, Props, TagProps } from '../index.d';
+import type { Options, Props } from '../index.d';
+
+interface TagProps
+  extends Omit<
+    Props,
+    'children' | 'hasSourceMap' | 'isMinified' | 'isPrefixed'
+  > {}
 
 const INTERNAL_PROPS: Record<string, true> = {
   children: true,
