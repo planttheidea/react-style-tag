@@ -1,4 +1,5 @@
 import { createElement, forwardRef, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { createGetCachedLinkHref } from './blob';
 import { normalizeOptions } from './options';
 import { getRenderedStyles } from './styles';
@@ -78,17 +79,19 @@ export const Style = forwardRef<HTMLLinkElement | HTMLStyleElement, Props>(
     const style = /*#__NOINLINE__*/ useStyle(props.children, options);
 
     if (options.hasSourceMap) {
-      return createElement(Link, {
-        passedProps,
-        ref: ref as MutableRefObject<HTMLLinkElement>,
-        style,
-      });
+      return createPortal(
+        createElement(Link, {
+          passedProps,
+          ref: ref as MutableRefObject<HTMLLinkElement>,
+          style,
+        }),
+        document.head
+      );
     }
 
-    return createElement(
-      'style',
-      Object.assign({}, passedProps, { ref }),
-      style
+    return createPortal(
+      createElement('style', Object.assign({}, passedProps, { ref }), style),
+      document.head
     );
   }
 ) as ComponentType<Props>;
