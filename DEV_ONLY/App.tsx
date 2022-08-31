@@ -101,6 +101,8 @@ export default function App() {
       // hasSourceMap((sourceMap) => !sourceMap);
     }, 5000);
 
+    console.log({ ref });
+
     return () => clearInterval(interval);
   }, []);
 
