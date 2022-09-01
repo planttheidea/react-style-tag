@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import React from 'react';
 import { Style } from '../src/Style';
@@ -10,14 +10,22 @@ function Wrapper({ children }: { children: ReactNode }) {
   return <div data-testid="test">{children}</div>;
 }
 
-function getRenderedStyleTag(jsx: JSX.Element) {
+function getRenderedStyleTag(jsx: JSX.Element): HTMLElement {
   const { getByTestId } = render(jsx, {
     wrapper: Wrapper,
   });
 
   const container = getByTestId('test');
 
-  return Array.from(container.children)[0]!;
+  let owner: HTMLElement | null = container;
+
+  while (owner && owner.constructor.name !== 'HTMLHtmlElement') {
+    owner = owner.parentElement;
+  }
+
+  // @ts-expect-error - I'm really introspecting internals here, but its hard to traverse
+  // to the `document.head` otherwise.
+  return Array.from(owner.firstChild.children)[0]!;
 }
 
 describe('Style', () => {
