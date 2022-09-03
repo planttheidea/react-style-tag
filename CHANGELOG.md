@@ -1,5 +1,9 @@
 # react-style-tag CHANGELOG
 
+## 3.0.1
+
+- [#55](https://github.com/planttheidea/react-style-tag/issues/55) - `link` / `style` tags no longer migrated to `document.head`
+
 ## 3.0.0
 
 **Breaking Changes**

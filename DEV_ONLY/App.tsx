@@ -101,6 +101,8 @@ export default function App() {
       // hasSourceMap((sourceMap) => !sourceMap);
     }, 5000);
 
+    console.log({ ref });
+
     return () => clearInterval(interval);
   }, []);
 
@@ -114,7 +116,9 @@ export default function App() {
         </button>
       </div>
 
-      <span className="foo">When hovered, I turn red.</span>
+      <span className="foo">
+        When hovered, I {visible ? 'turn red' : 'do nothing'}.
+      </span>
 
       <button onClick={onClickToggleDiv} type="button">
         Toggle div
